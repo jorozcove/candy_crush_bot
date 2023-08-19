@@ -10,23 +10,24 @@ class cv2CandySensor:
         self.top_left = (133, 87)
         self.cell_size_h = 88
         self.cell_size_v = 78
-        self.template_images = self.get_templates()
-        self.image_paths = 'actual_cells'
+        self.template_images_colors, self.template_images_variants = self.get_templates()
 
         print(f"Time to load templates: {time.time() - start_time}")
 
     def get_templates(self):
         candy_colors = ['blue', 'green', 'orange', 'purple', 'red', 'yellow']
 
-        template_images = {}
+        template_images_colors = {}
+        template_images_variants = {}
         for color in candy_colors:
-            template_images[color] = cv2.imread(f'candies/{color}/{color}.png', cv2.IMREAD_UNCHANGED)
-            template_images[color+'_sh'] = cv2.imread(f'candies/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
-            template_images[color+'_sv'] = cv2.imread(f'candies/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
-            template_images[color+'_p'] = cv2.imread(f'candies/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
+            template_images_colors[color] = cv2.imread(f'candies/{color}/{color}.png', cv2.IMREAD_UNCHANGED)
 
-        template_images['Ñ'] = cv2.imread(f'candies/Special/special.png', cv2.IMREAD_UNCHANGED)
-        return template_images
+            template_images_variants[color+'_sh'] = cv2.imread(f'candies/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
+            template_images_variants[color+'_sv'] = cv2.imread(f'candies/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
+            template_images_variants[color+'_p'] = cv2.imread(f'candies/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
+
+        template_images_variants['Ñ'] = cv2.imread(f'candies/Special/special.png', cv2.IMREAD_UNCHANGED)
+        return template_images_colors, template_images_variants
 
     def get_candy_matrix(self):
         start_time = time.time()
@@ -46,29 +47,37 @@ class cv2CandySensor:
                 # Convert BGR to RGB
                 cell_im_rgb = cv2.cvtColor(cell_im, cv2.COLOR_BGR2RGB)
 
-                # Save the image
-                # img_path = f'{self.image_paths}/{i}_{j}.png'
-                # cv2.imwrite(img_path, cell_im_rgb)
-
-                predicted_candy_color = self.classify_candy(cell_im_rgb, self.template_images)
+                predicted_candy_color = self.classify_candy(cell_im_rgb)
                 candy_matrix[i, j] = predicted_candy_color[0] + ('_'+predicted_candy_color.split('_')[1] if '_' in predicted_candy_color else '')
 
         print(f"Time to get candy matrix: {time.time() - start_time}")
         return candy_matrix
 
-    def classify_candy(self, image, template_images):
+    def classify_candy(self, image):
         best_match = None
         best_score = 0.0
         
-        for variant, template in template_images.items():
+        # First, check the main candy color
+        for color, template in self.template_images_colors.items():
             result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+
+            if max_val > 0.75:
+                best_score = max_val
+                best_match = color
+                break
+
             if max_val > best_score:
                 best_score = max_val
-                best_match = variant
+                best_match = color
+        
+        # Then, check the variants of the best_match color
+        for variant, template in self.template_images_variants.items():
+            if variant.startswith(best_match):
+                result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
+                min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+                if max_val > best_score:
+                    best_score = max_val
+                    best_match = variant
         
         return best_match
-
-# if __name__ == '__main__':
-#     candy_sensor = cv2CandySensor()
-#     print(candy_sensor.get_candy_matrix())
