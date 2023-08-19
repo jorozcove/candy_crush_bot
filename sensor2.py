@@ -21,11 +21,11 @@ class cv2CandySensor:
         template_images = {}
         for color in candy_colors:
             template_images[color] = cv2.imread(f'candies/{color}/{color}.png', cv2.IMREAD_UNCHANGED)
-        #     template_images[color+'_sh'] = cv2.imread(f'candies/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
-        #     template_images[color+'_sv'] = cv2.imread(f'candies/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
-        #     template_images[color+'_p'] = cv2.imread(f'candies/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
+            template_images[color+'_sh'] = cv2.imread(f'candies/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
+            template_images[color+'_sv'] = cv2.imread(f'candies/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
+            template_images[color+'_p'] = cv2.imread(f'candies/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
 
-        # template_images['Ñ'] = cv2.imread(f'candies/Special/special.png', cv2.IMREAD_UNCHANGED)
+        template_images['Ñ'] = cv2.imread(f'candies/Special/special.png', cv2.IMREAD_UNCHANGED)
         return template_images
 
     def get_candy_matrix(self):
@@ -47,8 +47,8 @@ class cv2CandySensor:
                 cell_im_rgb = cv2.cvtColor(cell_im, cv2.COLOR_BGR2RGB)
 
                 # Save the image
-                img_path = f'{self.image_paths}/{i}_{j}.png'
-                cv2.imwrite(img_path, cell_im_rgb)
+                # img_path = f'{self.image_paths}/{i}_{j}.png'
+                # cv2.imwrite(img_path, cell_im_rgb)
 
                 predicted_candy_color = self.classify_candy(cell_im_rgb, self.template_images)
                 candy_matrix[i, j] = predicted_candy_color[0] + ('_'+predicted_candy_color.split('_')[1] if '_' in predicted_candy_color else '')
