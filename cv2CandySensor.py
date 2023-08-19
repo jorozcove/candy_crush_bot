@@ -63,8 +63,11 @@ class cv2CandySensor:
         for variant, template in template_images.items():
             result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+            # if max_val > 0.75:
+            #     best_match = variant
+            #     break
+
             if max_val > best_score:
                 best_score = max_val
                 best_match = variant
-        
         return best_match

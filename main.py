@@ -1,4 +1,5 @@
-from cv2CandySensor import cv2CandySensor
+# from cv2CandySensor import cv2CandySensor
+from sensor2 import cv2CandySensor
 
 if __name__ == '__main__':
     candy_sensor = cv2CandySensor()
