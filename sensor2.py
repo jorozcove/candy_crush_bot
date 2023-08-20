@@ -4,12 +4,13 @@ import pyscreenshot as ImageGrab
 import time
 
 class cv2CandySensor:
-    def __init__(self):
+    def __init__(self, x, y, cell_size_h, cell_size_v, templates_path):
         start_time = time.time()
 
-        self.top_left = (133, 87)
-        self.cell_size_h = 88
-        self.cell_size_v = 78
+        self.top_left = (x, y)
+        self.cell_size_h = cell_size_h
+        self.cell_size_v = cell_size_v
+        self.templates_path = templates_path
         self.template_images_colors, self.template_images_variants = self.get_templates()
 
         print(f"Time to load templates: {time.time() - start_time}")
@@ -20,13 +21,13 @@ class cv2CandySensor:
         template_images_colors = {}
         template_images_variants = {}
         for color in candy_colors:
-            template_images_colors[color] = cv2.imread(f'candies/{color}/{color}.png', cv2.IMREAD_UNCHANGED)
+            template_images_colors[color] = cv2.imread(f'{self.templates_path}/{color}/{color}.png', cv2.IMREAD_UNCHANGED)
 
-            template_images_variants[color+'_sh'] = cv2.imread(f'candies/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
-            template_images_variants[color+'_sv'] = cv2.imread(f'candies/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
-            template_images_variants[color+'_p'] = cv2.imread(f'candies/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
+            template_images_variants[color+'_sh'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
+            template_images_variants[color+'_sv'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
+            template_images_variants[color+'_p'] = cv2.imread(f'{self.templates_path}/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
 
-        template_images_variants['Ñ'] = cv2.imread(f'candies/Special/special.png', cv2.IMREAD_UNCHANGED)
+        template_images_variants['Ñ'] = cv2.imread(f'{self.templates_path}/Special/special.png', cv2.IMREAD_UNCHANGED)
         return template_images_colors, template_images_variants
 
     def get_candy_matrix(self):
@@ -62,10 +63,10 @@ class cv2CandySensor:
             result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
-            if max_val > 0.75:
-                best_score = max_val
-                best_match = color
-                break
+            # if max_val > 0.75:
+            #     best_score = max_val
+            #     best_match = color
+            #     break
 
             if max_val > best_score:
                 best_score = max_val

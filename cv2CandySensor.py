@@ -5,13 +5,14 @@ import pyscreenshot as ImageGrab
 import time
 
 class cv2CandySensor:
-    def __init__(self):
+    def __init__(self, x, y, cell_size_h, cell_size_v, templates_path):
         start_time = time.time()
 
-        self.top_left = (133, 87)
-        self.cell_size_h = 88
-        self.cell_size_v = 78
+        self.top_left = (x, y)
+        self.cell_size_h = cell_size_h
+        self.cell_size_v = cell_size_v
         self.image_paths = 'actual_cells'
+        self.templates_path = templates_path
         self.template_images = self.get_templates()
 
         print(f"Time to load templates: {time.time() - start_time}")
@@ -21,12 +22,12 @@ class cv2CandySensor:
 
         template_images = {}
         for color in candy_colors:
-            template_images[color] = cv2.imread(f'candies/{color}/{color}.png', cv2.IMREAD_UNCHANGED)
-            template_images[color+'_sh'] = cv2.imread(f'candies/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
-            template_images[color+'_sv'] = cv2.imread(f'candies/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
-            template_images[color+'_p'] = cv2.imread(f'candies/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
+            template_images[color] = cv2.imread(f'{self.templates_path}/{color}/{color}.png', cv2.IMREAD_UNCHANGED)
+            template_images[color+'_sh'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
+            template_images[color+'_sv'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
+            template_images[color+'_p'] = cv2.imread(f'{self.templates_path}/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
 
-        template_images['Ñ'] = cv2.imread(f'candies/Special/special.png', cv2.IMREAD_UNCHANGED)
+        template_images['Ñ'] = cv2.imread(f'{self.templates_path}/Special/special.png', cv2.IMREAD_UNCHANGED)
         return template_images
 
     def crop_cell(self, im, i,j):
