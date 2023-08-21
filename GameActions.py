@@ -12,13 +12,13 @@ class GameActions:
     def click(self, x, y):
         win32api.SetCursorPos((x, y))
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-        # time.sleep(0.02)
+        # sleep(1)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
 
     def click_cell(self, cell_i, cell_j):
         self.click(self.x + self.cell_size_w * cell_j + self.cell_size_w // 2, self.y + self.cell_size_h * cell_i + self.cell_size_h // 2)
 
-    def exchange_cells(self, cell_i, cell_j, direction):
+    def swap_cells(self, cell_i, cell_j, direction):
         if direction == 'up':
             self.click_cell(cell_i, cell_j)
             sleep(0.05)
