@@ -2,14 +2,27 @@
 import os
 from PIL import Image
 
+def resize_images(w, h):
 
-def resize_images(path, h, v):
-    for root, dirs, files in os.walk(path):
-        for file in files:
+    new_path = f'candies{w}x{h}'
+
+    os.makedirs(new_path)
+    print(f"New path: {new_path}")
+
+    root = os.path.join(os.getcwd(), 'candies')
+    dirs = os.listdir(root)
+
+    for dir in dirs:
+        os.makedirs(os.path.join(new_path, dir))
+
+        for file in os.listdir(os.path.join(root, dir)):
             if file.endswith(".png") or file.endswith(".bmp"):
-                image = Image.open(os.path.join(root, file))
-                image = image.resize((h, v), Image.ANTIALIAS)
-                image.save(os.path.join(root, file))
+                image = Image.open(os.path.join(root, dir, file))
+                image = image.resize((w, h), Image.ANTIALIAS)
 
-new_folder = 'candies_pc2'
-resize_images(new_folder, 71, 63)
+                image.save(os.path.join(new_path, dir, file))
+
+    return new_path  
+                
+
+                
