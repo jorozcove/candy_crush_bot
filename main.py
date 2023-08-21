@@ -9,6 +9,7 @@ import os
 import subprocess
 
 import keyboard
+from agent import Agent
 
 def main():
 
@@ -27,7 +28,7 @@ def main():
     candy_sensor = cv2CandySensor(x, y, cell_size_w, cell_size_h, templates_path=templates_path)
 
     # init game actions
-    Actions = GameActions(x, y, cell_size_w, cell_size_h)
+    actions = GameActions(x, y, cell_size_w, cell_size_h)
 
     for i in range(4):
         Actions.click_cell(0, 0)
@@ -36,14 +37,14 @@ def main():
     # Wait for game to load
     sleep(2)
 
+    candy_agent = Agent() 
+
     while keyboard.is_pressed('q') == False:
         if not candy_sensor.board_is_moving():     
-            candy_matrix = candy_sensor.get_candy_matrix()
-            print(candy_matrix)
-            i, j = map(int, input("Introduce i, j: ").split())
-            direction = input("Introduce direction: ")
-            Actions.swap_cells(i, j, direction)
-                        
+            print(candy_sensor.get_candy_matrix())
+            candy_agent.set_game_matrix(candy_sensor.get_candy_matrix())
+            i, j, direction = candy_agent.play()
+            actions.exchange_cells(i, j, direction)
         else:
             print("Board is moving...")
             sleep(0.1)

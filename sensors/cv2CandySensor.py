@@ -16,7 +16,7 @@ class cv2CandySensor:
         self.templates_path = templates_path
         self.template_images_special, self.template_images_colors, self.template_images_variants = self.get_templates()
 
-        #Print board size
+        #print board size
         print(f"Board size: {self.cell_size_w * 9}x{self.cell_size_h * 9}")
 
         print(f"Time to load templates: {time.time() - start_time}")
