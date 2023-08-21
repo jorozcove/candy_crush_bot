@@ -31,7 +31,7 @@ def main():
     actions = GameActions(x, y, cell_size_w, cell_size_h)
 
     for i in range(4):
-        Actions.click_cell(0, 0)
+        actions.click_cell(0, 0)
         sleep(0.01)
     
     # Wait for game to load
@@ -40,14 +40,22 @@ def main():
     candy_agent = Agent() 
 
     while keyboard.is_pressed('q') == False:
-        if not candy_sensor.board_is_moving():     
-            print(candy_sensor.get_candy_matrix())
-            candy_agent.set_game_matrix(candy_sensor.get_candy_matrix())
-            i, j, direction = candy_agent.play()
-            actions.exchange_cells(i, j, direction)
-        else:
-            print("Board is moving...")
-            sleep(0.1)
+        # if not candy_sensor.board_is_moving():     
+        candy_matrix = candy_sensor.get_candy_matrix()
+        print(candy_matrix)
+        candy_agent.set_game_matrix(candy_matrix)
+        mov_data = candy_agent.play()
+        if mov_data is not None:
+            i, j, direction = mov_data
+        
+        actions.swap_cells(i, j, direction)
+
+        if keyboard.is_pressed('p'):
+            print("Paused...")
+            sleep(3)
+        # else:
+        #     print("Board is moving...")
+        #     sleep(0.1)
         
 
 if __name__ == '__main__':
