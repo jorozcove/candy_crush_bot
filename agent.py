@@ -9,11 +9,11 @@ class Agent:
         self.game_matrix = matrix
 
     def decide_best_move(self, i, j, move):
-        # Aquí se debe implementar la lógica para decidir el mejor movimiento
+        # Aquí se implementa la lógica para decidir el mejor movimiento
         # basado en la matriz del juego.
-        # El movimiento debe ser guardado en el atributo best_move.
+        # El movimiento se guarda en el atributo best_move.
 
-        # El movimiento debe ser una tupla de la forma (x, y, direction)
+        # El movimiento es una tupla de la forma (x, y, direction)
         # donde x e y son las coordenadas de la celda a mover y direction
         # es la dirección en la que se moverá la celda.
         # direction puede ser 'up', 'down', 'left' o 'right'.
@@ -26,56 +26,37 @@ class Agent:
         # - Dulces con rayas verticales eliminan la columna (*_sv).
         # - Dulce de chocolate (Ñ) elimina todos los dulces del color que se intercambia.
 
-        matrix = deepcopy(self.game_matrix) # Make a copy of the matrix
+        matrix = deepcopy(self.game_matrix) # Se hace una copia de la matriz
 
         score = 0
         new_pos = None
 
-        # Make the move
-        if move == "up":
-            if i == 0:
-                return 0, None
-            matrix[i][j], matrix[i-1][j] = matrix[i-1][j], matrix[i][j]
-            k = i-1
-            m = j
-        elif move == "down":
-            if i == 8:
-                return 0, None
-            matrix[i][j], matrix[i+1][j] = matrix[i+1][j], matrix[i][j]
-            k = i+1
-            m = j
-        elif move == "left":
-            if j == 0:
-                return 0, None
-            matrix[i][j], matrix[i][j-1] = matrix[i][j-1], matrix[i][j]
-            k = i
-            m = j-1
-        elif move == "right":
-            if j == 8:
-                return 0, None
-            matrix[i][j], matrix[i][j+1] = matrix[i][j+1], matrix[i][j]
-            k = i
-            m = j+1
+        # Se realiza el movimiento
+        moves = {
+            "up": {"condition": i == 0, "swap": (i-1, j), "new_pos": (i-1, j)},
+            "down": {"condition": i == 8, "swap": (i+1, j), "new_pos": (i+1, j)},
+            "left": {"condition": j == 0, "swap": (i, j-1), "new_pos": (i, j-1)},
+            "right": {"condition": j == 8, "swap": (i, j+1), "new_pos": (i, j+1)}
+        }
+
+        if moves[move]["condition"]:
+            return 0, None
+        matrix[i][j], matrix[moves[move]["swap"]] = matrix[moves[move]["swap"]], matrix[i][j]
+        k, m = moves[move]["new_pos"]
         
-        # Check if there is a match
-        if k < 7 and matrix[k][m] == matrix[k-1][m] == matrix[k+1][m]:
-            score += 60
-            new_pos = (i, j, move)
-            return score, new_pos
-        if k < 7 and (matrix[k][m] == matrix[k+1][m] == matrix[k+2][m]):
-            score += 60
-            new_pos = (i, j, move)
-            return score, new_pos
-        if m < 7 and matrix[k][m] == matrix[k][m-1] == matrix[k][m+1]:
-            score += 60
-            new_pos = (i, j, move)
-            return score, new_pos
-        if m < 7 and (matrix[k][m] == matrix[k][m+1] == matrix[k][m+2]):
+        # Se verifica si hay una coincidencia
+        match_conditions = [
+            (k < 7 and matrix[k][m] == matrix[k-1][m] == matrix[k+1][m]),
+            (k < 7 and matrix[k][m] == matrix[k+1][m] == matrix[k+2][m]),
+            (m < 7 and matrix[k][m] == matrix[k][m-1] == matrix[k][m+1]),
+            (m < 7 and matrix[k][m] == matrix[k][m+1] == matrix[k][m+2])
+        ]
+
+        if any(match_conditions):
             score += 60
             new_pos = (i, j, move)
             return score, new_pos
 
-        
         return score, new_pos
 
     def compute_best_move(self):
@@ -93,4 +74,4 @@ class Agent:
         if self.game_matrix is None:
             raise Exception(FileNotFoundError("Game matrix not found"))
         self.compute_best_move()
-        return self.best_move
+        return self.best_move if self.best_move is not None else (0, 0, 'right')
