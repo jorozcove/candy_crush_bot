@@ -8,6 +8,8 @@ import os
 
 import subprocess
 
+from agent import Agent
+
 def main():
 
     # Open game
@@ -25,17 +27,19 @@ def main():
     candy_sensor = cv2CandySensor(x, y, cell_size_w, cell_size_h, templates_path=templates_path)
 
     # init game actions
-    Actions = GameActions(x, y, cell_size_w, cell_size_h)
+    actions = GameActions(x, y, cell_size_w, cell_size_h)
     
     # Wait for game to load
     sleep(14)
 
+    candy_agent = Agent() 
+
     while True:
         if not candy_sensor.board_is_moving():     
             print(candy_sensor.get_candy_matrix())
-            i, j = map(int, input("Introduce i, j: ").split())
-            direction = input("Introduce direction: ")
-            Actions.exchange_cells(i, j, direction)
+            candy_agent.set_game_matrix(candy_sensor.get_candy_matrix())
+            i, j, direction = candy_agent.play()
+            actions.exchange_cells(i, j, direction)
         else:
             print("Board is moving...")
             sleep(0.2)

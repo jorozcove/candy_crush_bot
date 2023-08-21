@@ -1,28 +1,11 @@
+from copy import deepcopy
+
 class Agent:
     def __init__(self):
         self.game_matrix = None
         self.best_move = None
 
-    def receive_game_matrix(self, matrix):
-        """
-        Recibe la matriz del juego y la guarda en el atributo game_matrix.
-        matrix: Matriz del juego.
-        [ [candy, candy, candy, candy, candy, candy, candy, candy, candy, candy],
-            [candy, candy, candy, candy, candy, candy, candy, candy, candy, candy],
-            [candy, candy, candy, candy, candy, candy, candy, candy, candy, candy],
-            [candy, candy, candy, candy, candy, candy, candy, candy, candy, candy],
-            [candy, candy, candy, candy, candy, candy, candy, candy, candy, candy],
-            [candy, candy, candy, candy, candy, candy, candy, candy, candy, candy],
-            [candy, candy, candy, candy, candy, candy, candy, candy, candy, candy],
-            [candy, candy, candy, candy, candy, candy, candy, candy, candy, candy],
-            [candy, candy, candy, candy, candy, candy, candy, candy, candy, candy],
-            [candy, candy, candy, candy, candy, candy, candy, candy, candy, candy] ]
-        (candy types:
-            red, blue, green, orange, purple, yellow, red_sh, blue_sh, green_sh, orange_sh, purple_sh, yellow_sh,
-            red_sv, blue_sv, green_sv, orange_sv, purple_sv, yellow_sv, red_p, blue_p, green_p, orange_p, purple_p, yellow_p,
-            Ñ
-        )
-        """
+    def set_game_matrix(self, matrix):
         self.game_matrix = matrix
 
     def decide_best_move(self, i, j, move):
@@ -43,22 +26,71 @@ class Agent:
         # - Dulces con rayas verticales eliminan la columna (*_sv).
         # - Dulce de chocolate (Ñ) elimina todos los dulces del color que se intercambia.
 
-        self.compute_best_move()
+        matrix = deepcopy(self.game_matrix) # Make a copy of the matrix
 
-    def compute_best_move(self, matrix):
-        self.receive_game_matrix(matrix)
+        score = 0
+        new_pos = None
+
+        # Make the move
+        if move == "up":
+            if i == 0:
+                return 0, None
+            matrix[i][j], matrix[i-1][j] = matrix[i-1][j], matrix[i][j]
+            k = i-1
+            m = j
+        elif move == "down":
+            if i == 8:
+                return 0, None
+            matrix[i][j], matrix[i+1][j] = matrix[i+1][j], matrix[i][j]
+            k = i+1
+            m = j
+        elif move == "left":
+            if j == 0:
+                return 0, None
+            matrix[i][j], matrix[i][j-1] = matrix[i][j-1], matrix[i][j]
+            k = i
+            m = j-1
+        elif move == "right":
+            if j == 8:
+                return 0, None
+            matrix[i][j], matrix[i][j+1] = matrix[i][j+1], matrix[i][j]
+            k = i
+            m = j+1
+        
+        # Check if there is a match
+        if k < 7 and matrix[k][m] == matrix[k-1][m] == matrix[k+1][m]:
+            score += 60
+            new_pos = (i, j, move)
+            return score, new_pos
+        if k < 7 and (matrix[k][m] == matrix[k+1][m] == matrix[k+2][m]):
+            score += 60
+            new_pos = (i, j, move)
+            return score, new_pos
+        if m < 7 and matrix[k][m] == matrix[k][m-1] == matrix[k][m+1]:
+            score += 60
+            new_pos = (i, j, move)
+            return score, new_pos
+        if m < 7 and (matrix[k][m] == matrix[k][m+1] == matrix[k][m+2]):
+            score += 60
+            new_pos = (i, j, move)
+            return score, new_pos
+
+        
+        return score, new_pos
+
+    def compute_best_move(self):
         max_score = 0
         for i in range(9):
             for j in range(9):
                 possible_moves = ['up', 'down', 'left', 'right']
                 for move in possible_moves:
                     score, new_pos = self.decide_best_move(i, j, move)
-                    if score > max_score:
+                    if score >= max_score:
                         max_score = score
                         self.best_move = new_pos
 
     def play(self):
         if self.game_matrix is None:
-            raise Exception("No se ha recibido ninguna matriz de juego.")
-        self.decide_best_move()
+            raise Exception(FileNotFoundError("Game matrix not found"))
+        self.compute_best_move()
         return self.best_move
