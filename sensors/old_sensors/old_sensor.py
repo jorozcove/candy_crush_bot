@@ -19,12 +19,12 @@ candies
 '''
 
 top_left = (133, 87)
-cell_size_h = 88
-cell_size_v = 78
+cell_size_w = 88
+cell_size_h = 78
 candy_colors = ['blue', 'green', 'orange', 'purple', 'red', 'yellow']
 
 def get_cell_region(i,j):
-    region = (top_left[0] + i * cell_size_h, top_left[1] + j * cell_size_v, cell_size_h, cell_size_v)
+    region = (top_left[0] + i * cell_size_w, top_left[1] + j * cell_size_h, cell_size_w, cell_size_h)
     return region
 
 def main():

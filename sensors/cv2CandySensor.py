@@ -5,14 +5,19 @@ import time
 import threading
 
 class cv2CandySensor:
-    def __init__(self, x, y, cell_size_h, cell_size_v, templates_path):
+    def __init__(self, x, y, cell_size_w, cell_size_h, templates_path):
         start_time = time.time()
 
+        print(f"x = {x}, y = {y}, cell_size_w = {cell_size_w}, cell_size_h = {cell_size_h}, templates_path='{templates_path}'")
+
         self.top_left = (x, y)
+        self.cell_size_w = cell_size_w
         self.cell_size_h = cell_size_h
-        self.cell_size_v = cell_size_v
         self.templates_path = templates_path
-        self.template_images_colors, self.template_images_variants = self.get_templates()
+        self.template_images_special, self.template_images_colors, self.template_images_variants = self.get_templates()
+
+        #Print board size
+        print(f"Board size: {self.cell_size_w * 9}x{self.cell_size_h * 9}")
 
         print(f"Time to load templates: {time.time() - start_time}")
 
@@ -21,6 +26,7 @@ class cv2CandySensor:
 
         template_images_colors = {}
         template_images_variants = {}
+        template_images_special = {}
         for color in candy_colors:
             template_images_colors[color] = cv2.imread(f'{self.templates_path}/{color}/{color}.png', cv2.IMREAD_UNCHANGED)
 
@@ -28,13 +34,17 @@ class cv2CandySensor:
             template_images_variants[color+'_sv'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
             template_images_variants[color+'_p'] = cv2.imread(f'{self.templates_path}/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
 
-        template_images_variants['Ñ'] = cv2.imread(f'{self.templates_path}/Special/special.png', cv2.IMREAD_UNCHANGED)
-        return template_images_colors, template_images_variants
+        template_images_special['Special_1'] = cv2.imread(f'{self.templates_path}/Special/special.png', cv2.IMREAD_UNCHANGED)
+        template_images_special['Special_2'] = cv2.imread(f'{self.templates_path}/Special/special2.png', cv2.IMREAD_UNCHANGED)
+        template_images_special['Special_3'] = cv2.imread(f'{self.templates_path}/Special/special3.png', cv2.IMREAD_UNCHANGED)
+        template_images_special['Special_4'] = cv2.imread(f'{self.templates_path}/Special/special4.png', cv2.IMREAD_UNCHANGED)
+
+        return template_images_special, template_images_colors, template_images_variants
 
     def get_candy_matrix(self):
         start_time = time.time()
 
-        bottom_right = (self.top_left[0] + 9 * self.cell_size_h, self.top_left[1] + 9 * self.cell_size_v)
+        bottom_right = (self.top_left[0] + 9 * self.cell_size_w, self.top_left[1] + 9 * self.cell_size_h)
         im = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], bottom_right[0], bottom_right[1]))
 
         im_array = np.asarray(im)  # Convert the PIL image to a NumPy array
@@ -44,8 +54,8 @@ class cv2CandySensor:
 
         for i in range(9):
             for j in range(9):
-                y1, y2 = i * self.cell_size_v, (i + 1) * self.cell_size_v
-                x1, x2 = j * self.cell_size_h, (j + 1) * self.cell_size_h
+                y1, y2 = i * self.cell_size_h, (i + 1) * self.cell_size_h
+                x1, x2 = j * self.cell_size_w, (j + 1) * self.cell_size_w
                 cell_im = im_array[y1:y2, x1:x2]  # Use array slicing on the NumPy array
 
                 # Convert BGR to RGB
@@ -69,8 +79,17 @@ class cv2CandySensor:
     def classify_candy(self, image):
         best_match = None
         best_score = 0.0
+
+        #first check the special candies
+        for special, template in self.template_images_special.items():
+            result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+            
+            if max_val > best_score:
+                best_score = max_val
+                best_match = "Ñ"
         
-        # First, check the main candy color
+        # then, check the main candy color
         for color, template in self.template_images_colors.items():
             result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
@@ -94,3 +113,23 @@ class cv2CandySensor:
                     best_match = variant
         
         return best_match
+
+    # Check if the board is moving by taking 2 screenshots and comparing them whith a threshold percentage
+    def board_is_moving(self):
+        im1 = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], self.top_left[0] + 9 * self.cell_size_w, self.top_left[1] + 9 * self.cell_size_h))
+        time.sleep(0.05)
+        im2 = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], self.top_left[0] + 9 * self.cell_size_w, self.top_left[1] + 9 * self.cell_size_h))
+
+        im1_array = np.asarray(im1)
+        im2_array = np.asarray(im2)
+
+        threshold = 0.03
+        difference = np.sum(np.abs(im1_array - im2_array)) 
+        
+        t = threshold * np.sum(im2_array)
+        print(f"difference: {difference}, t: {t}")
+        return difference > t
+
+        # return not np.array_equal(im1_array, im2_array)
+        
+

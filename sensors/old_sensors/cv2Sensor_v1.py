@@ -5,12 +5,12 @@ import pyscreenshot as ImageGrab
 import time
 
 class cv2CandySensor:
-    def __init__(self, x, y, cell_size_h, cell_size_v, templates_path):
+    def __init__(self, x, y, cell_size_w, cell_size_h, templates_path):
         start_time = time.time()
 
         self.top_left = (x, y)
+        self.cell_size_w = cell_size_w
         self.cell_size_h = cell_size_h
-        self.cell_size_v = cell_size_v
         self.image_paths = 'actual_cells'
         self.templates_path = templates_path
         self.template_images = self.get_templates()
@@ -31,14 +31,14 @@ class cv2CandySensor:
         return template_images
 
     def crop_cell(self, im, i,j):
-        box = (i * self.cell_size_h, j * self.cell_size_v, (i + 1) * self.cell_size_h, (j + 1) * self.cell_size_v)
+        box = (i * self.cell_size_w, j * self.cell_size_h, (i + 1) * self.cell_size_w, (j + 1) * self.cell_size_h)
         cell_im = im.crop(box)
         return cell_im
 
     def get_candy_matrix(self):
         start_time = time.time()
 
-        bottom_right = (self.top_left[0] + 9 * self.cell_size_h, self.top_left[1] + 9 * self.cell_size_v)
+        bottom_right = (self.top_left[0] + 9 * self.cell_size_w, self.top_left[1] + 9 * self.cell_size_h)
         im = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], bottom_right[0], bottom_right[1]))
 
         candy_matrix = np.empty((9, 9), dtype=object)
