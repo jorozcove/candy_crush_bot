@@ -114,3 +114,22 @@ class cv2CandySensor:
         
         return best_match
 
+    # Check if the board is moving by taking 2 screenshots and comparing them whith a threshold percentage
+    def board_is_moving(self):
+        im1 = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], self.top_left[0] + 9 * self.cell_size_w, self.top_left[1] + 9 * self.cell_size_h))
+        time.sleep(0.05)
+        im2 = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], self.top_left[0] + 9 * self.cell_size_w, self.top_left[1] + 9 * self.cell_size_h))
+
+        im1_array = np.asarray(im1)
+        im2_array = np.asarray(im2)
+
+        threshold = 0.03
+        difference = np.sum(np.abs(im1_array - im2_array)) 
+        
+        t = threshold * np.sum(im2_array)
+        print(f"difference: {difference}, t: {t}")
+        return difference > t
+
+        # return not np.array_equal(im1_array, im2_array)
+        
+

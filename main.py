@@ -1,6 +1,7 @@
 from sensors.cv2CandySensor import cv2CandySensor
 from sensors.board_detector import get_board_data
 from resizer import resize_images
+from GameActions import GameActions
 
 from time import sleep
 import os
@@ -23,12 +24,22 @@ def main():
     # Create sensor object
     candy_sensor = cv2CandySensor(x, y, cell_size_w, cell_size_h, templates_path=templates_path)
 
+    # init game actions
+    Actions = GameActions(x, y, cell_size_w, cell_size_h)
+    
     # Wait for game to load
     sleep(14)
 
     while True:
-        print(candy_sensor.get_candy_matrix())
-        input("Enter to continue...")
+        if not candy_sensor.board_is_moving():     
+            print(candy_sensor.get_candy_matrix())
+            i, j = map(int, input("Introduce i, j: ").split())
+            direction = input("Introduce direction: ")
+            Actions.exchange_cells(i, j, direction)
+        else:
+            print("Board is moving...")
+            sleep(0.2)
+        
 
 if __name__ == '__main__':
     main()
