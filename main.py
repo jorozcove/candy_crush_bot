@@ -8,11 +8,13 @@ import os
 
 import subprocess
 
+import keyboard
+
 def main():
 
     # Open game
     subprocess.Popen(["Game/ruffle.exe", "Game/CandyCrush.swf"])
-    sleep(10)
+    sleep(5)
 
     # Get board data, resize images if needed
     x, y, cell_size_w, cell_size_h = get_board_data() 
@@ -26,19 +28,25 @@ def main():
 
     # init game actions
     Actions = GameActions(x, y, cell_size_w, cell_size_h)
+
+    for i in range(4):
+        Actions.click_cell(0, 0)
+        sleep(0.01)
     
     # Wait for game to load
-    sleep(14)
+    sleep(2)
 
-    while True:
+    while keyboard.is_pressed('q') == False:
         if not candy_sensor.board_is_moving():     
-            print(candy_sensor.get_candy_matrix())
+            candy_matrix = candy_sensor.get_candy_matrix()
+            print(candy_matrix)
             i, j = map(int, input("Introduce i, j: ").split())
             direction = input("Introduce direction: ")
-            Actions.exchange_cells(i, j, direction)
+            Actions.swap_cells(i, j, direction)
+                        
         else:
             print("Board is moving...")
-            sleep(0.2)
+            sleep(0.1)
         
 
 if __name__ == '__main__':
