@@ -9,71 +9,58 @@ class Agent:
         self.game_matrix = matrix
 
     def decide_best_move(self, i, j, move):
-        matrix = deepcopy(self.game_matrix)  # Make a copy of the matrix
+        matrix = deepcopy(self.game_matrix)  # Hacer una copia de la matriz
 
         score = 0
         new_pos = None
 
-        # Make the move
-        if move == "up":
-            if i == 0:
-                return 0, None
-            matrix[i][j], matrix[i-1][j] = matrix[i-1][j], matrix[i][j]
-            k = i-1
-            m = j
-        elif move == "down":
-            if i == 8:
-                return 0, None
-            matrix[i][j], matrix[i+1][j] = matrix[i+1][j], matrix[i][j]
-            k = i+1
-            m = j
-        elif move == "left":
-            if j == 0:
-                return 0, None
-            matrix[i][j], matrix[i][j-1] = matrix[i][j-1], matrix[i][j]
-            k = i
-            m = j-1
-        elif move == "right":
-            if j == 8:
-                return 0, None
-            matrix[i][j], matrix[i][j+1] = matrix[i][j+1], matrix[i][j]
-            k = i
-            m = j+1
+        # Realizar el movimiento
+        moves = {
+            "up": {"condition": i == 0, "swap": (i-1, j), "new_pos": (i-1, j)},
+            "down": {"condition": i == 8, "swap": (i+1, j), "new_pos": (i+1, j)},
+            "left": {"condition": j == 0, "swap": (i, j-1), "new_pos": (i, j-1)},
+            "right": {"condition": j == 8, "swap": (i, j+1), "new_pos": (i, j+1)}
+        }
+
+        if moves[move]["condition"]:
+            return 0, None
+        matrix[i][j], matrix[moves[move]["swap"]] = matrix[moves[move]["swap"]], matrix[i][j]
+        k, m = moves[move]["new_pos"]
         
-        # Check for matches
+        # Verificar coincidencias
         color = matrix[k][m]
 
-        # Helper function to calculate score and new_pos
+        # Función auxiliar para calcular la puntuación y new_pos
         def update_score_and_pos(match_score):
             nonlocal score, new_pos
             score += match_score
             new_pos = (i, j, move)
             return True
         
-        # Horizontal matches
+        # Coincidencias horizontales
         if m >= 2 and matrix[k][m-2] == matrix[k][m-1] == matrix[k][m]:
-            update_score_and_pos(80 if m >= 3 else 60)  # Line of 4 or more
+            update_score_and_pos(80 if m >= 3 else 60)  # Línea de 4 o más
         elif m >= 1 and m <= 6 and matrix[k][m-1] == matrix[k][m] == matrix[k][m+1]:
-            update_score_and_pos(80)  # Line of 3 with middle
+            update_score_and_pos(80)  # Línea de 3 con medio
         elif m <= 5 and matrix[k][m] == matrix[k][m+1] == matrix[k][m+2]:
-            update_score_and_pos(80 if m <= 4 else 60)  # Line of 4 or more
+            update_score_and_pos(80 if m <= 4 else 60)  # Línea de 4 o más
         
-        # Vertical matches
+        # Coincidencias verticales
         elif k >= 2 and matrix[k-2][m] == matrix[k-1][m] == matrix[k][m]:
-            update_score_and_pos(80 if k >= 3 else 60)  # Line of 4 or more
+            update_score_and_pos(80 if k >= 3 else 60)  # Línea de 4 o más
         elif k >= 1 and k <= 6 and matrix[k-1][m] == matrix[k][m] == matrix[k+1][m]:
-            update_score_and_pos(80)  # Line of 3 with middle
+            update_score_and_pos(80)  # Línea de 3 con medio
         elif k <= 5 and matrix[k][m] == matrix[k+1][m] == matrix[k+2][m]:
-            update_score_and_pos(80 if k <= 4 else 60)  # Line of 4 or more
+            update_score_and_pos(80 if k <= 4 else 60)  # Línea de 4 o más
         
-        # # Special candy matches and combinations
+        # Coincidencias de dulces especiales y combinaciones
         # elif color == 'Ñ':
-        #     # Handle chocolate special candy
-        #     # Add logic here to prioritize swapping with another special candy
+        #     # Manejar dulce especial de chocolate
+        #     # Añadir lógica aquí para priorizar el intercambio con otro dulce especial
         #     pass
         # elif color.endswith('_sv') or color.endswith('_sh') or color.endswith('_p'):
-        #     # Handle special candy variants
-        #     # Add logic here to prioritize swapping with another special candy
+        #     # Manejar variantes de dulces especiales
+        #     # Añadir lógica aquí para priorizar el intercambio con otro dulce especial
         #     pass
 
         return score, new_pos
