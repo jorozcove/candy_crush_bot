@@ -11,7 +11,13 @@ import subprocess
 import keyboard
 from agent import Agent
 
+from datetime import datetime
+
+max_time = 4*60 + 20
+
 def main():
+
+    start_time = datetime.now()
 
     # Open game
     subprocess.Popen(["Game/ruffle.exe", "Game/CandyCrush.swf"])
@@ -43,6 +49,10 @@ def main():
         # if not candy_sensor.board_is_moving():     
         candy_matrix = candy_sensor.get_candy_matrix()
         print(candy_matrix)
+        if candy_matrix is None:
+            print("Game Ended")
+            break
+
         candy_agent.set_game_matrix(candy_matrix)
         mov_data = candy_agent.play()
         if mov_data is not None:
@@ -56,6 +66,10 @@ def main():
         # else:
         #     print("Board is moving...")
         #     sleep(0.1)
+
+        if (datetime.now() - start_time).total_seconds() > max_time:
+            print("Time out")
+            break
         
 
 if __name__ == '__main__':
