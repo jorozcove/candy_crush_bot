@@ -30,9 +30,9 @@ class cv2CandySensor:
         for color in candy_colors:
             template_images_colors[color] = cv2.imread(f'{self.templates_path}/{color}/{color}.png', cv2.IMREAD_UNCHANGED)
 
-            template_images_variants[color+'_sh'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
-            template_images_variants[color+'_sv'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
-            template_images_variants[color+'_p'] = cv2.imread(f'{self.templates_path}/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
+            # template_images_variants[color+'_sh'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
+            # template_images_variants[color+'_sv'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
+            # template_images_variants[color+'_p'] = cv2.imread(f'{self.templates_path}/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
 
         template_images_special['Special_1'] = cv2.imread(f'{self.templates_path}/Special/special.png', cv2.IMREAD_UNCHANGED)
         template_images_special['Special_2'] = cv2.imread(f'{self.templates_path}/Special/special2.png', cv2.IMREAD_UNCHANGED)
@@ -60,6 +60,10 @@ class cv2CandySensor:
 
                 # Convert BGR to RGB
                 cell_im_rgb = cv2.cvtColor(cell_im, cv2.COLOR_BGR2RGB)
+
+                #check if the cell is black
+                if np.sum(cell_im_rgb) < 1000:
+                    return None
 
                 thread = threading.Thread(target=self.process_candy, args=(cell_im_rgb, candy_matrix, i, j))
                 threads.append(thread)
@@ -131,5 +135,4 @@ class cv2CandySensor:
         return difference > t
 
         # return not np.array_equal(im1_array, im2_array)
-        
 

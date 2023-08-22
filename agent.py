@@ -21,10 +21,15 @@ class Agent:
         # se moverá hacia la derecha.
         # Algunas consideraciones:
         # - Dulces normales dan 60 puntos.
+        # - Linea de 4 dulces da un dulce especial. 80 puntos.
+        # - Linea de 5 dulces da un dulce de chocolate (Ñ) 100 puntos.
         # - Dulces especiales dan 120 puntos.
-        # - Dulces con rayas horizontales eliminan la fila (*_sh).
-        # - Dulces con rayas verticales eliminan la columna (*_sv).
-        # - Dulce de chocolate (Ñ) elimina todos los dulces del color que se intercambia.
+        # - Dulces con rayas horizontales eliminan la fila (nombre termina en _sh).
+        # - Dulces con rayas verticales eliminan la columna (nombre termina en _sv).
+        # - Dulces empaquetados eliminan todos los dulces alrededor (nombre termina en _p).
+        # - Dulce de chocolate (Ñ) elimina todos los dulces del color que se intercambia. 150 puntos.
+        # - Combo dulce empaquetado + dulce rayado elimina 3 filas y 3 columnas. 250 puntos.
+        # - Combo dulce especial + chocolate (Ñ) 200 puntos.
 
         matrix = deepcopy(self.game_matrix) # Make a copy of the matrix
 
