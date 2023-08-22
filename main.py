@@ -9,7 +9,7 @@ import os
 import subprocess
 
 import keyboard
-from agent_v2 import Agent
+from agents.agent_v2 import Agent
 
 from datetime import datetime
 
