@@ -1,24 +1,25 @@
-from win32api import GetSystemMetrics
 import win32gui
-import win32con
 
-def get_window_coords():
+# return x, y and size of window
+def get_window_data():
     window_name = 'Ruffle - CandyCrush.swf'
     hwnd = win32gui.FindWindow(None, window_name)
     if hwnd:
         win32gui.SetForegroundWindow(hwnd)
         rect = win32gui.GetWindowRect(hwnd)  
-        return rect[0], rect[1]
+        x, y = rect[0], rect[1]
+        w, h = rect[2] - x, rect[3] - y
+        return x, y, w, h
+
     else:
         return None
 
 def get_board_data():
-    screen_size = (GetSystemMetrics(0), GetSystemMetrics(1))
+    x, y, w, h = get_window_data()
+    window_size = (w, h)
+    cell_size_percentage = (0.09147609147609148, 0.09552599758162031)#(0.03697916666666667, 0.058333333333333334)
 
-    cell_size_percentage = (0.03697916666666667, 0.058333333333333334)
-    cell_size_w, cell_size_h = int(screen_size[0] * cell_size_percentage[0]), int(screen_size[1] * cell_size_percentage[1])
-
-    x, y = get_window_coords()
+    cell_size_w, cell_size_h = int(window_size[0] * cell_size_percentage[0]), int(window_size[1] * cell_size_percentage[1])
 
     if x is None or y is None:
         raise Exception("Game window not found")
