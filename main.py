@@ -1,5 +1,6 @@
 from sensors.cv2CandySensor import cv2CandySensor
 # from sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
+# from CandyDetector_v2 import CandyDetector
 import platform
 if platform.system() == 'Windows':
     from sensors.board_detector import get_board_data
@@ -38,6 +39,8 @@ def main():
 
     # Create sensor object
     candy_sensor = cv2CandySensor(x, y, cell_size_w, cell_size_h, templates_path=templates_path)
+    # candy_sensor = CandyDetector(x, y, cell_size_w, cell_size_h, templates_path=templates_path)
+
 
     # init game actions
     actions = GameActions(x, y, cell_size_w, cell_size_h)
