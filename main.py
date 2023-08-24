@@ -1,4 +1,5 @@
 from sensors.cv2CandySensor import cv2CandySensor
+# from sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
 import platform
 if platform.system() == 'Windows':
     from sensors.board_detector import get_board_data
@@ -16,6 +17,7 @@ import keyboard
 from agents.agent_v2 import Agent
 
 from datetime import datetime
+import pyautogui
 
 max_time = 4*60 + 20
 
@@ -25,7 +27,7 @@ def main():
 
     # Open game
     subprocess.Popen(["Game/ruffle.exe", "Game/CandyCrush.swf"])
-    sleep(5)
+    sleep(9)
 
     # Get board data, resize images if needed
     x, y, cell_size_w, cell_size_h = get_board_data() 
@@ -63,6 +65,8 @@ def main():
             i, j, direction = mov_data
         
         actions.swap_cells(i, j, direction)
+        # actions.click_cell(0, 0)
+        # print(pyautogui.position())
 
         if keyboard.is_pressed('p'):
             print("Paused...")
@@ -76,7 +80,7 @@ def main():
             break
         
 
-if __name__ == '__main__':
+if __name__ == '__main__':   
     main()
 
 # portatil juan
