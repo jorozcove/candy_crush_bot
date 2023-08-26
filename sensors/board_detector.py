@@ -17,7 +17,7 @@ def get_window_data():
 def get_board_data():
     x, y, w, h = get_window_data()
     window_size = (w, h)
-    cell_size_percentage = (0.09147609147609148, 0.09552599758162031)#(0.03697916666666667, 0.058333333333333334)
+    cell_size_percentage = (0.09247609147609148, 0.09552599758162031)#(0.03697916666666667, 0.058333333333333334)
 
     cell_size_w, cell_size_h = int(window_size[0] * cell_size_percentage[0]), int(window_size[1] * cell_size_percentage[1])
 
