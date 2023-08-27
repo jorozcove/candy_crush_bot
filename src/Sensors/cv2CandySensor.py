@@ -35,9 +35,9 @@ class cv2CandySensor:
         for color in candy_colors:
             template_images_colors[color] = cv2.imread(f'{self.templates_path}/{color}/{color}.png', cv2.IMREAD_UNCHANGED)
 
-            # template_images_variants[color+'_sh'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
-            # template_images_variants[color+'_sv'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
-            # template_images_variants[color+'_p'] = cv2.imread(f'{self.templates_path}/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
+            template_images_variants[color+'_sh'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sh.png', cv2.IMREAD_UNCHANGED)
+            template_images_variants[color+'_sv'] = cv2.imread(f'{self.templates_path}/{color}/{color}_sv.png', cv2.IMREAD_UNCHANGED)
+            template_images_variants[color+'_p'] = cv2.imread(f'{self.templates_path}/{color}/{color}_p.png', cv2.IMREAD_UNCHANGED)
 
         template_images_special['Special_1'] = cv2.imread(f'{self.templates_path}/Special/special.png', cv2.IMREAD_UNCHANGED)
         template_images_special['Special_2'] = cv2.imread(f'{self.templates_path}/Special/special2.png', cv2.IMREAD_UNCHANGED)
