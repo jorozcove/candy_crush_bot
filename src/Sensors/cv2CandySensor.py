@@ -3,6 +3,9 @@ import numpy as np
 import pyscreenshot as ImageGrab
 import time
 import threading
+import pyautogui
+
+from .windowcapture import WindowCapture
 
 class cv2CandySensor:
     def __init__(self, x, y, cell_size_w, cell_size_h, templates_path):
@@ -15,6 +18,8 @@ class cv2CandySensor:
         self.cell_size_h = cell_size_h
         self.templates_path = templates_path
         self.template_images_special, self.template_images_colors, self.template_images_variants = self.get_templates()
+
+        self.wincap = WindowCapture('Ruffle - CandyCrush.swf')
 
         #print board size
         print(f"Board size: {self.cell_size_w * 9}x{self.cell_size_h * 9}")
@@ -45,9 +50,17 @@ class cv2CandySensor:
         start_time = time.time()
 
         bottom_right = (self.top_left[0] + 9 * self.cell_size_w, self.top_left[1] + 9 * self.cell_size_h)
-        im = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], bottom_right[0], bottom_right[1]))
+        # im = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], bottom_right[0], bottom_right[1]))
+        # im = pyautogui.screenshot(region=(self.top_left[0], self.top_left[1], self.cell_size_w * 9, self.cell_size_h * 9))
 
-        im_array = np.asarray(im)  # Convert the PIL image to a NumPy array
+        im_array = self.wincap.get_screenshot()
+
+        #use array slicing on the NumPy array
+
+        # im_array = np.asarray(im)  # Convert image to a NumPy array
+        # im_array = cv2.cvtColor(im_array, cv2.COLOR_RGB2BGR)
+
+        # cv2.imshow('screen', im_array)
 
         candy_matrix = np.empty((9, 9), dtype=object)
         threads = []
@@ -59,13 +72,9 @@ class cv2CandySensor:
                 cell_im = im_array[y1:y2, x1:x2]  # Use array slicing on the NumPy array
 
                 # Convert BGR to RGB
-                cell_im_rgb = cv2.cvtColor(cell_im, cv2.COLOR_BGR2RGB)
+                # cell_im_rgb = cv2.cvtColor(cell_im, cv2.COLOR_BGR2RGB)
 
-                #check if the cell is black
-                if np.sum(cell_im_rgb) < 1000:
-                    return None
-
-                thread = threading.Thread(target=self.process_candy, args=(cell_im_rgb, candy_matrix, i, j))
+                thread = threading.Thread(target=self.process_candy, args=(cell_im, candy_matrix, i, j))
                 threads.append(thread)
                 thread.start()
 
@@ -136,3 +145,7 @@ class cv2CandySensor:
 
         # return not np.array_equal(im1_array, im2_array)
 
+if __name__ == '__main__':
+    # print("Running test...")
+    # wincap = WindowCapture('Ruffle - CandyCrush.swf')
+    pass

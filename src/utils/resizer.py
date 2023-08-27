@@ -2,14 +2,14 @@
 import os
 from PIL import Image
 
-def resize_images(w, h):
+def resize_images(w, h, path):
 
-    new_path = f'candies{w}x{h}'
-
+    new_path = os.path.join(os.getcwd(), f'{path}{w}x{h}')
+    
     os.makedirs(new_path)
     print(f"New path: {new_path}")
 
-    root = os.path.join(os.getcwd(), 'candies')
+    root = os.path.join(os.getcwd(), path)
     dirs = os.listdir(root)
 
     for dir in dirs:

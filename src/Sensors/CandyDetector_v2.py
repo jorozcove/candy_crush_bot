@@ -3,6 +3,9 @@ import numpy as np
 import time
 import pyscreenshot as ImageGrab
 import threading
+import pyautogui
+
+from .windowcapture import WindowCapture
 
 class CandyDetector:
     def __init__(self, x, y, cell_size_w, cell_size_h, templates_path):
@@ -19,6 +22,8 @@ class CandyDetector:
             'yellow': 0.85
         }
         self.templates_colors = self.get_templates()
+
+        self.wincap = WindowCapture('Ruffle - CandyCrush.swf')
 
     def to_board_i_j(self, center_x, center_y):
         i = int(center_y / self.cell_size_h)
@@ -52,11 +57,30 @@ class CandyDetector:
                 color[0] + ("_" + color.split("_")[1] if "_" in color else "")
             )
 
+            #draw rectangle on image depending on color
+            rgb_colors = {
+                'blue': (255, 0, 0),
+                'green': (0, 255, 0),
+                'orange': (0, 165, 255),
+                'purple': (255, 0, 255),
+                'red': (0, 0, 255),
+                'yellow': (0, 255, 255)
+            }
+
+            cv2.rectangle(board_im_array, (rect[0], rect[1]), (rect[0] + rect[2], rect[1] + rect[3]), rgb_colors[color], 2)
+
+
     def get_candy_matrix(self):
         start_time = time.time()
         bottom_right = (self.top_left[0] + 9 * self.cell_size_w, self.top_left[1] + 9 * self.cell_size_h)
-        board_im = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], bottom_right[0], bottom_right[1]))
-        board_im_array = cv2.cvtColor(np.asarray(board_im), cv2.COLOR_BGR2RGB)
+        # board_im = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], bottom_right[0], bottom_right[1]))
+        # board_im = pyautogui.screenshot(region=(self.top_left[0], self.top_left[1], self.cell_size_w * 9, self.cell_size_h * 9))
+
+        board_im_array = self.wincap.get_screenshot()
+        
+        # board_im_array = cv2.cvtColor(np.asarray(board_im), cv2.COLOR_BGR2RGB)
+
+        # cv2.imshow('board', board_im_array)
 
         candy_matrix = np.empty((9, 9), dtype=object)
         threads = []
@@ -70,10 +94,12 @@ class CandyDetector:
         for thread in threads:
             thread.join()
 
+        cv2.imshow('board', board_im_array)
+
+
         print(f"Time to get candy matrix: {time.time() - start_time}")
 
         return candy_matrix
-
 if __name__ == "__main__":
     pass
 
