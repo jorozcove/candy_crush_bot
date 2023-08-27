@@ -1,82 +1,60 @@
-from sensors.cv2CandySensor import cv2CandySensor
-# from sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
-from CandyDetector_v2 import CandyDetector
+# from src.Sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
+from src.Sensors.cv2CandySensor import cv2CandySensor
+from src.Sensors.CandyDetector_v2 import CandyDetector
 
-import platform
-if platform.system() == 'Windows':
-    from sensors.board_detector import get_board_data
-else:
-    from  sensors.board_detector_linux import get_board_data
-from resizer import resize_images
-from GameActions import GameActions
+from src.utils.GameUtils import GameActions
 
-from time import sleep
-import os
-
-import subprocess
-
-import keyboard
-from agents.agent_v2 import Agent
+from src.Agents.agent_v2 import Agent
 
 from datetime import datetime
-
-
-#librerias temporales para debug
-import pyautogui
+from time import sleep
+import keyboard
 import cv2
-
-max_time = 4*60 + 20
 
 def main():
 
+    max_time = 4*60 + 20
     start_time = datetime.now()
 
-    # Open game
-    subprocess.Popen(["Game/ruffle.exe", "Game/CandyCrush.swf"])
-    sleep(9)
+    # init game actions
+    actions = GameActions(
+        game_path = 'src/Game/ruffle.exe',
+        ruffle_path = 'src/Game/CandyCrush.swf',
+        templates_main_path = 'src/candy_templates/candies'
+    )
 
-    # Get board data, resize images if needed
-    x, y, cell_size_w, cell_size_h = get_board_data() 
-    templates_path = f'candies{cell_size_w}x{cell_size_h}'
-    if not os.path.exists(templates_path):
-        print(f"Resizing images to {cell_size_w}x{cell_size_h}")
-        templates_path = resize_images(w = cell_size_w, h = cell_size_h)
+    actions.open_game()
+    actions.skip_intro()
 
     # Create sensor object
-    candy_sensor = cv2CandySensor(x, y, cell_size_w, cell_size_h, templates_path=templates_path)
-    # candy_sensor = CandyDetector(x, y, cell_size_w, cell_size_h, templates_path=templates_path)
+    candy_sensor = cv2CandySensor(*actions.get_board_data())
+    # candy_sensor = CandyDetector(*actions.get_board_data())
 
-
-    # init game actions
-    actions = GameActions(x, y, cell_size_w, cell_size_h)
-
-    for i in range(4):
-        actions.click_cell(0, 0)
-        sleep(0.01)
-    
-    # Wait for game to load
-    sleep(2)
-
+    # init agent
     candy_agent = Agent() 
 
+    # Bot loop
     while keyboard.is_pressed('q') == False:
-        candy_matrix = candy_sensor.get_candy_matrix()
-        print(candy_matrix)
-        if candy_matrix is None:
-            print("Game Ended")
-            break
 
+        # Get game matrix
+        candy_matrix = candy_sensor.get_candy_matrix()   
+        print(candy_matrix)
+
+        # Set game matrix to agent
         candy_agent.set_game_matrix(candy_matrix)
+
+        # Get best move and execute it
         mov_data = candy_agent.play()
         if mov_data is not None:
             i, j, direction = mov_data
-        
-        actions.swap_cells(i, j, direction)
+            actions.swap_cells(i, j, direction)
 
+        # Check if user wants to pause
         if keyboard.is_pressed('p'):
             print("Paused...")
             sleep(3)
 
+        # Check if time is over
         if (datetime.now() - start_time).total_seconds() > max_time:
             print("Time out")
             break

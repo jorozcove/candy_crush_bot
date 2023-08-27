@@ -5,7 +5,7 @@ import time
 import threading
 import pyautogui
 
-from windowcapture import WindowCapture
+from .windowcapture import WindowCapture
 
 class cv2CandySensor:
     def __init__(self, x, y, cell_size_w, cell_size_h, templates_path):
@@ -58,11 +58,9 @@ class cv2CandySensor:
         #use array slicing on the NumPy array
 
         # im_array = np.asarray(im)  # Convert image to a NumPy array
-        
-
-
         # im_array = cv2.cvtColor(im_array, cv2.COLOR_RGB2BGR)
-        cv2.imshow('screen', im_array)
+
+        # cv2.imshow('screen', im_array)
 
         candy_matrix = np.empty((9, 9), dtype=object)
         threads = []
@@ -75,10 +73,6 @@ class cv2CandySensor:
 
                 # Convert BGR to RGB
                 # cell_im_rgb = cv2.cvtColor(cell_im, cv2.COLOR_BGR2RGB)
-
-                #check if the cell is black
-                if np.sum(cell_im) < 1000:
-                    return None
 
                 thread = threading.Thread(target=self.process_candy, args=(cell_im, candy_matrix, i, j))
                 threads.append(thread)
@@ -151,3 +145,7 @@ class cv2CandySensor:
 
         # return not np.array_equal(im1_array, im2_array)
 
+if __name__ == '__main__':
+    # print("Running test...")
+    # wincap = WindowCapture('Ruffle - CandyCrush.swf')
+    pass

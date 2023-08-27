@@ -5,7 +5,7 @@ import pyscreenshot as ImageGrab
 import threading
 import pyautogui
 
-from windowcapture import WindowCapture
+from .windowcapture import WindowCapture
 
 class CandyDetector:
     def __init__(self, x, y, cell_size_w, cell_size_h, templates_path):
