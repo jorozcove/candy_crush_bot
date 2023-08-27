@@ -22,7 +22,4 @@ def resize_images(w, h, path):
 
                 image.save(os.path.join(new_path, dir, file))
 
-    return new_path  
-                
-
-                
+    return new_path 
