@@ -1,6 +1,6 @@
 from sensors.cv2CandySensor import cv2CandySensor
 # from sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
-# from CandyDetector_v2 import CandyDetector
+from CandyDetector_v2 import CandyDetector
 
 import platform
 if platform.system() == 'Windows':
@@ -19,7 +19,11 @@ import keyboard
 from agents.agent_v2 import Agent
 
 from datetime import datetime
+
+
+#librerias temporales para debug
 import pyautogui
+import cv2
 
 max_time = 4*60 + 20
 
@@ -56,7 +60,6 @@ def main():
     candy_agent = Agent() 
 
     while keyboard.is_pressed('q') == False:
-        # if not candy_sensor.board_is_moving():     
         candy_matrix = candy_sensor.get_candy_matrix()
         print(candy_matrix)
         if candy_matrix is None:
@@ -69,19 +72,18 @@ def main():
             i, j, direction = mov_data
         
         actions.swap_cells(i, j, direction)
-        # actions.click_cell(0, 0)
-        # print(pyautogui.position())
 
         if keyboard.is_pressed('p'):
             print("Paused...")
             sleep(3)
-        # else:
-        #     print("Board is moving...")
-        #     sleep(0.1)
 
         if (datetime.now() - start_time).total_seconds() > max_time:
             print("Time out")
             break
+
+        cv2.waitKey(1)
+
+    cv2.destroyAllWindows()
         
 
 if __name__ == '__main__':   

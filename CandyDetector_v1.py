@@ -28,7 +28,7 @@ class CandyDetector:
         template_images_colors = {}
         for color in self.candy_colors.keys():
             template_images_colors[color] = cv2.imread(
-                f'{self.templates_path}/{color}/{color}.png', cv2.IMREAD_UNCHANGED
+                f'{self.templates_path}/{color}/{color}.png', cv2.IMREAD_COLOR
             )
         return template_images_colors
 
