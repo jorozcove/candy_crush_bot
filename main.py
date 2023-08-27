@@ -2,11 +2,7 @@ from sensors.cv2CandySensor import cv2CandySensor
 # from sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
 # from CandyDetector_v2 import CandyDetector
 
-import platform
-if platform.system() == 'Windows':
-    from sensors.board_detector import get_board_data
-else:
-    from  sensors.board_detector_linux import get_board_data
+from sensors.board_detector import get_board_data
 from resizer import resize_images
 from GameActions import GameActions
 
