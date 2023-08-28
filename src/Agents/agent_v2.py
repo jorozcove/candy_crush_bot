@@ -1,11 +1,12 @@
 from copy import deepcopy
 import itertools
+import time
 
 class Agent:
     def __init__(self):
         self.game_matrix = None
         self.best_move = None
-        self.special_candies = ['_Ñ', '_sv', '_sh', '_p']
+        self.special_candies = ['Ñ', '_sv', '_sh', '_p']
         self.possible_combos = list(itertools.permutations(self.special_candies, 2))
         self.combos = {}
 
@@ -58,14 +59,25 @@ class Agent:
         # Coincidencias horizontales
         count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[k]))
         update_score_and_pos(count_dict['3'] * 60)
-        update_score_and_pos(count_dict['4'] * 80)
-        update_score_and_pos(count_dict['5'] * 100)
+        update_score_and_pos(count_dict['4'] * 100)
+        update_score_and_pos(count_dict['5'] * 150)
+
+        # count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[i]))
+        # update_score_and_pos(count_dict['3'] * 60)
+        # update_score_and_pos(count_dict['4'] * 100)
+        # update_score_and_pos(count_dict['5'] * 150)
 
         # Coincidencias verticales
         count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[:, m]))
         update_score_and_pos(count_dict['3'] * 60)
-        update_score_and_pos(count_dict['4'] * 80)
-        update_score_and_pos(count_dict['5'] * 100)
+        update_score_and_pos(count_dict['4'] * 100)
+        update_score_and_pos(count_dict['5'] * 150)
+
+        # count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[:, j]))
+        # update_score_and_pos(count_dict['3'] * 60)
+        # update_score_and_pos(count_dict['4'] * 100)
+        # update_score_and_pos(count_dict['5'] * 150)
+        
 
         return score, new_pos
 
@@ -121,11 +133,11 @@ class Agent:
         return None 
     
     def score_combo(self, combo):
-        if combo == '_Ñ_Ñ':
+        if combo == 'ÑÑ':
             return 1000
-        elif combo == '_Ñ_sv' or combo == '_Ñ_sh' or combo == '_sv_Ñ' or combo == '_sh_Ñ':
+        elif combo == 'Ñ_sv' or combo == 'Ñ_sh' or combo == '_svÑ' or combo == '_shÑ':
             return 800
-        elif combo == '_Ñ_p' or combo == '_p_Ñ':
+        elif combo == 'Ñ_p' or combo == '_pÑ':
             return 500
         elif combo == '_sv_sv' or combo == '_sv_sh' or combo == '_sh_sv' or combo == '_sh_sh':
             return 400
@@ -137,6 +149,7 @@ class Agent:
             return 0           
 
     def compute_best_move(self):
+        start_time = time.time()
         max_score = 0
         for i in range(9):
             for j in range(9):
@@ -152,6 +165,7 @@ class Agent:
         print(self.combos)
         print("===========================================")
         self.combos = {}
+        print("Time to compute best move: ", time.time() - start_time)
 
     def play(self):
         if self.game_matrix is None:
