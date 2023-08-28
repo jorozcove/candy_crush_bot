@@ -1,14 +1,25 @@
 from copy import deepcopy
+import itertools
 
 class Agent:
     def __init__(self):
         self.game_matrix = None
         self.best_move = None
+        self.special_candies = ['_Ñ', '_sv', '_sh', '_p']
+        self.possible_combos = list(itertools.permutations(self.special_candies, 2))
+        self.combos = {}
 
     def set_game_matrix(self, matrix):
         self.game_matrix = matrix
 
     def decide_best_move(self, i, j, move):
+
+        # Función auxiliar para calcular la puntuación y new_pos
+        def update_score_and_pos(match_score):
+            nonlocal score, new_pos
+            score += match_score
+            new_pos = (i, j, move)
+
         matrix = deepcopy(self.game_matrix)  # Hacer una copia de la matriz
 
         score = 0
@@ -24,21 +35,25 @@ class Agent:
 
         if moves[move]["condition"]:
             return 0, None
-        
+
+        # Obtener movimientos que sean combos
+        if self.is_special_candy(matrix[moves[move]["swap"]]) and self.is_special_candy(matrix[i][j]):
+            combo = self.get_combo(matrix[moves[move]["swap"]], matrix[i][j])
+
+            if combo is not None:
+                self.combos[(i, j, move)] = combo
+
+                # Obtener la puntuación del combo
+                score = self.score_combo(combo)
+                update_score_and_pos(score)
+            
         # Intercambiar dulces en la copia de la matriz
         matrix[i][j], matrix[moves[move]["swap"]] = matrix[moves[move]["swap"]], matrix[i][j]
 
         # Obtener la nueva posición
         k, m = moves[move]["new_pos"]
         
-        # Verificar coincidencias
-        color = matrix[k][m]
-
-        # Función auxiliar para calcular la puntuación y new_pos
-        def update_score_and_pos(match_score):
-            nonlocal score, new_pos
-            score += match_score
-            new_pos = (i, j, move)
+        candy = matrix[k][m]
         
         # Coincidencias horizontales
         count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[k]))
@@ -90,8 +105,36 @@ class Agent:
 
         return count_consecutives
 
-    # def count_combos(self, matrix):
+    def is_special_candy(self, candy):
+        for special in self.special_candies:
+            if candy!= None and candy.endswith(special):
+                return True
+        return False
 
+    def get_combo(self, candy1, candy2):
+        print(">>>>>>>>>>", candy1, candy2)
+        for combo in self.possible_combos:
+            if candy1.endswith(combo[0]) and candy2.endswith(combo[1]):
+                return combo[0] + combo[1]
+            elif candy1.endswith(combo[1]) and candy2.endswith(combo[0]):
+                return combo[1] + combo[0]
+        return None 
+    
+    def score_combo(self, combo):
+        if combo == '_Ñ_Ñ':
+            return 1000
+        elif combo == '_Ñ_sv' or combo == '_Ñ_sh' or combo == '_sv_Ñ' or combo == '_sh_Ñ':
+            return 800
+        elif combo == '_Ñ_p' or combo == '_p_Ñ':
+            return 500
+        elif combo == '_sv_sv' or combo == '_sv_sh' or combo == '_sh_sv' or combo == '_sh_sh':
+            return 400
+        elif combo == '_sv_p' or combo == '_p_sv' or combo == '_sh_p' or combo == '_p_sh':
+            return 1300
+        elif combo == '_p_p':
+            return 350
+        else:
+            return 0           
 
     def compute_best_move(self):
         max_score = 0
@@ -104,6 +147,11 @@ class Agent:
                     if score >= max_score:
                         max_score = score
                         self.best_move = new_pos
+        
+        print("==================COMBOS==================")
+        print(self.combos)
+        print("===========================================")
+        self.combos = {}
 
     def play(self):
         if self.game_matrix is None:
