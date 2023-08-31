@@ -13,9 +13,6 @@ import cv2
 
 def main():
 
-    max_time = 4*60 + 20
-    start_time = datetime.now()
-
     # init game actions
     actions = GameActions(
         game_path = 'src/Game/ruffle.exe',
@@ -23,8 +20,11 @@ def main():
         templates_main_path = 'src/candy_templates/candies'
     )
 
-    actions.open_game()
+    actions.open_game(delay = 11)
     actions.skip_intro()
+
+    max_time = 4*60 + 12
+    start_time = datetime.now()
 
     # Create sensor object
     candy_sensor = cv2CandySensor(*actions.get_board_data())
@@ -37,6 +37,7 @@ def main():
     while keyboard.is_pressed('q') == False:
 
         # Get game matrix
+        # actions.pause_game() #pause game
         candy_matrix = candy_sensor.get_candy_matrix()   
         print(candy_matrix)
 
@@ -45,9 +46,12 @@ def main():
 
         # Get best move and execute it
         mov_data = candy_agent.play()
+        # sleep(0.01)
+        # actions.pause_game() #unpause game
+
         if mov_data is not None:
             i, j, direction = mov_data
-            actions.swap_cells(i, j, direction)
+            actions.swap_cells(i, j, direction)        
 
         # Check if user wants to pause
         if keyboard.is_pressed('p'):
@@ -62,7 +66,16 @@ def main():
         cv2.waitKey(1)
 
     cv2.destroyAllWindows()
-        
+
+    sleep(10)
+
+    # Take screenshot of score
+    score_im_array = candy_sensor.wincap.get_screenshot()
+    cv2.imwrite(f"src/score_screenshots/score_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png", score_im_array)
+
+    sleep(5)
+    # Close game
+    actions.close_game()
 
 if __name__ == '__main__':   
     main()

@@ -7,7 +7,7 @@ class Agent:
         self.game_matrix = None
         self.best_move = None
         self.special_candies = ['Ñ', '_sv', '_sh', '_p']
-        self.possible_combos = list(itertools.permutations(self.special_candies, 2))
+        self.possible_combos = list(itertools.permutations(self.special_candies, 2)) + [(candy, candy) for candy in self.special_candies]
         self.combos = {}
 
     def set_game_matrix(self, matrix):
