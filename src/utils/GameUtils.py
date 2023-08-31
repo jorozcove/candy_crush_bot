@@ -9,6 +9,7 @@ from .resizer import resize_images
 import os
 import subprocess
 from src.Sensors.board_detector import get_board_data
+import keyboard
 
 import pyautogui
 
@@ -18,12 +19,12 @@ class GameActions:
         self.ruffle_path = ruffle_path
         self.templates_main_path = templates_main_path
 
-    def open_game(self):
+    def open_game(self, delay = 8):
         # Open game
         subprocess.Popen([self.game_path, self.ruffle_path])
 
         # Wait for game to load
-        sleep(8)
+        sleep(delay)
 
         # Get board data, resize images if needed
         x, y, cell_size_w, cell_size_h = get_board_data() 
@@ -44,6 +45,14 @@ class GameActions:
             sleep(0.01)
         # Wait for game to begin
         sleep(2)
+
+    def pause_game(self):
+        # Pause game
+        keyboard.press_and_release('a')
+
+    def close_game(self):
+        # Close game
+        subprocess.Popen(['taskkill', '/F', '/IM', 'ruffle.exe'])
 
     def get_board_data(self):
         return self.x, self.y, self.cell_size_w, self.cell_size_h, self.templates_path
