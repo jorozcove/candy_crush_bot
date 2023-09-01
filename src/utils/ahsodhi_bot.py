@@ -1,12 +1,12 @@
 # CODE FROM. https://github.com/ahsodhi/candy-crush-bot
 # Adaptation to run on python 3
 
-from PIL import Image
 import win32api, win32con
 import time
 import cv2
 from mss.windows import MSS as mss
 import pyscreenshot as ImageGrab
+import pyautogui
 import numpy as np
 
 
@@ -41,7 +41,7 @@ HRANGE = 89
 VRANGE = 79
 
 # middle of top left cell in pixels
-TOP_LEFT = (40, 35)
+TOP_LEFT = cell_size_w//2, cell_size_h//2
 
 COLS = 9
 ROWS = 9
@@ -368,6 +368,7 @@ def debug(gameboard, image):
     # for entry in unknown:
     #         print (entry)
     gameboard = np.array(gameboard)
+    debugImg(image)
     print (gameboard)
     print ('-' * 18 + '\n')
 #
@@ -375,14 +376,14 @@ def debug(gameboard, image):
 def debugImg(img):
     while True:
         cv2.imshow('test', img)
-        if cv2.waitKey(25) & 0xFF == ord('q'):
+        if cv2.waitKey(25) & 0xFF == ord('c'):
             cv2.destroyAllWindows()
             break
 #
 # Read pixel colors from game screen and initialize gameboard
 def initializeBoard(gameboard):
-    image = ImageGrab.grab(bbox=(SNAPSHOT_AREA['left'], SNAPSHOT_AREA['top'], SNAPSHOT_AREA['left']+SNAPSHOT_AREA['width'], SNAPSHOT_AREA['top']+SNAPSHOT_AREA['height']))
-    image = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
+    image = pyautogui.screenshot(region=(SNAPSHOT_AREA['left'], SNAPSHOT_AREA['top'], SNAPSHOT_AREA['width'], SNAPSHOT_AREA['height']))
+    image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     for r in range(ROWS):
         for c in range(COLS):
             colorVal = getCandyColor(r+1, c+1, image)
@@ -399,7 +400,7 @@ while not win32api.GetAsyncKeyState(ord('Q')) < 0:
     gameboard = [[0 for c in range(COLS)] for r in range(ROWS)]
     
     initializeBoard(gameboard)
-    
+   
     #if not '?' in [x for row in gameboard for x in row]:
     for i in range(MAX_MATCH, MIN_MATCH-1, -1):
         findPatterns(gameboard, i)
