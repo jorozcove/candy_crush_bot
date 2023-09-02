@@ -13,10 +13,15 @@ import numpy as np
 LEFT, RIGHT, TOP, BOTTOM = 0, 1, 2, 3
 
 # x = 133, y = 87, cell_size_w = 88, cell_size_h = 78, templates_path='candies'
+# 138, 96, 71, 63
 
-cell_size_w = 88
-cell_size_h = 78
-SNAPSHOT_AREA = {'top': 87, 'left': 133, 'width': cell_size_w * 9, 'height': cell_size_h * 9} ## Real
+cell_size_w = 71
+cell_size_h = 63
+SNAPSHOT_AREA = {'top': 72, 'left': 107, 'width': cell_size_w * 9, 'height': cell_size_h * 9} ## Real
+
+# cell_size_w = 88
+# cell_size_h = 78
+# SNAPSHOT_AREA = {'top': 87, 'left': 133, 'width': cell_size_w * 9, 'height': cell_size_h * 9} ## Real
 ## SNAPSHOT_AREA = {'top': 162, 'left': 608, 'width': 794, 'height': 700} ## Real
 ## SNAPSHOT_AREA = {'top': 109, 'left': 132, 'width': 794, 'height': 700} ## Testing
 
@@ -37,8 +42,8 @@ MIN_MATCH = 3
 MAX_MATCH = 5
 
 # horiz / vert distances between cells in pixels
-HRANGE = 89
-VRANGE = 79
+HRANGE = cell_size_w
+VRANGE = cell_size_h
 
 # middle of top left cell in pixels
 TOP_LEFT = cell_size_w//2, cell_size_h//2
