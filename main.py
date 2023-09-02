@@ -1,6 +1,7 @@
 # from src.Sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
 from src.Sensors.cv2CandySensor import cv2CandySensor
 from src.Sensors.CandyDetector_v2 import CandyDetector
+from src.Sensors.bgrCandySensor import BgrCandySensor
 
 from src.utils.GameUtils import GameActions
 
@@ -27,8 +28,9 @@ def main():
     start_time = datetime.now()
 
     # Create sensor object
-    candy_sensor = cv2CandySensor(*actions.get_board_data())
+    # candy_sensor = cv2CandySensor(*actions.get_board_data())
     # candy_sensor = CandyDetector(*actions.get_board_data())
+    candy_sensor = BgrCandySensor(*actions.get_board_data())
 
     # init agent
     candy_agent = Agent() 
