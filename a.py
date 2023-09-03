@@ -128,18 +128,16 @@ matrix = np.array([
     ['o', 'b', 'y', 'o', 'b', 'o', 'y', 'g', 'p']
 ])
 
-print(matrix[1][6])
-print(matrix[2][6])
 
 print(sorted(findMatches(matrix, 3), key=lambda x: x[0]))
 
 print(">>>>>>>>>")
 
-i = 1
-j = 6
-
 agent = Agent()
 agent.set_game_matrix(matrix)
-print(sorted(agent.find_matches(matrix), key=lambda x: x[0]))
 
-agent.simulate_result(matrix)
+matches = agent.find_matches(matrix)
+print(sorted(matches , key=lambda x: x[0]))
+
+while len(matches) > 0:
+    matches, matrix = agent.simulate_result(matrix)
