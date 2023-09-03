@@ -25,7 +25,8 @@ SNAPSHOT_AREA = {'top': 72, 'left': 107, 'width': cell_size_w * 9, 'height': cel
 ## SNAPSHOT_AREA = {'top': 162, 'left': 608, 'width': 794, 'height': 700} ## Real
 ## SNAPSHOT_AREA = {'top': 109, 'left': 132, 'width': 794, 'height': 700} ## Testing
 
-COLORS_BGR = {"Red": (1, 2, 246), "RS": (67, 70, 243), "RS2": (97, 101, 247), "RW": (36, 35, 253),
+COLORS_BGR = {
+          "Red": (1, 2, 246), "RS": (67, 70, 243), "RS2": (97, 101, 247), "RW": (36, 35, 253),
           "Green" : (2, 181, 54), "GS": (72, 237, 109), "GS2": (126, 244, 163), "GS3": (107, 242, 143), "GW": (47, 229, 91),
           "Blue": (255, 154, 44), "BS": (244, 205,  85), "BW": (255, 196,  36),
           "Yellow": (12, 225, 252), "YS": (76, 221, 250),
@@ -83,10 +84,11 @@ def getCandyColor(r,c,img):
 def categorizeColor(bgr_tuple):
     manhattan = lambda x,y : abs(x[0] - y[0]) + abs(x[1] - y[1]) + abs(x[2] - y[2])
     distances = {k: manhattan(v, bgr_tuple) for k, v in COLORS_BGR.items()}
+    # print(distances)
     color = min(distances, key=distances.get)
     threshold = 40
     if not distances[color] > threshold:
-        return color[0]
+        return color
     return '?'
 #
 # From r,c cell of gameboard, check [direction] for pattern with [sequence-1] # of same candies and 1 unique candy
@@ -396,6 +398,16 @@ def initializeBoard(gameboard):
             gameboard[r][c] = colorName
     if win32api.GetAsyncKeyState(ord('D')) < 0:
         debug(gameboard, image)
+
+def get_color(i, j, gameboard):
+    image = pyautogui.screenshot(region=(SNAPSHOT_AREA['left'], SNAPSHOT_AREA['top'], SNAPSHOT_AREA['width'], SNAPSHOT_AREA['height']))
+    image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+
+    colorVal = getCandyColor(i+1, j+1, image)
+    colorName = categorizeColor(colorVal)
+
+    return colorVal, colorName
+
 #
 # Entry point of program
 #
@@ -403,13 +415,25 @@ print("Running ...")
 while not win32api.GetAsyncKeyState(ord('Q')) < 0:
     POSSIBLE_SWAPS = {}
     gameboard = [[0 for c in range(COLS)] for r in range(ROWS)]
+
+    #read input
+    opt = input(">>")
+    if (opt != 'a'):
+        i, j = map(int, opt.split())
+        print(get_color(i, j, gameboard))
     
-    initializeBoard(gameboard)
+    else:
+        initializeBoard(gameboard)
+        g = np.array(gameboard)
+
+        print(g)
+
+    # initializeBoard(gameboard)
    
-    #if not '?' in [x for row in gameboard for x in row]:
-    for i in range(MAX_MATCH, MIN_MATCH-1, -1):
-        findPatterns(gameboard, i)
-        if len(POSSIBLE_SWAPS.keys()) > 0:
-            makeBestMove(gameboard)
-            break
+    # #if not '?' in [x for row in gameboard for x in row]:
+    # for i in range(MAX_MATCH, MIN_MATCH-1, -1):
+    #     findPatterns(gameboard, i)
+    #     if len(POSSIBLE_SWAPS.keys()) > 0:
+    #         makeBestMove(gameboard)
+    #         break
     
