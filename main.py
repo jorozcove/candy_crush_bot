@@ -29,9 +29,9 @@ def main():
 
     
     # Create sensor object
-    candy_sensor = cv2CandySensor(*actions.get_board_data())
+    # candy_sensor = cv2CandySensor(*actions.get_board_data())
     # candy_sensor = CandyDetector(*actions.get_board_data())
-    # candy_sensor = BgrCandySensor(*actions.get_board_data())
+    candy_sensor = BgrCandySensor(*actions.get_board_data())
 
     # init agent
     candy_agent = Agent() 

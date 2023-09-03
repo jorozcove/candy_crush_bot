@@ -24,6 +24,17 @@ class CandyDetector:
         self.templates_colors = self.get_templates()
 
         self.wincap = WindowCapture('Ruffle - CandyCrush.swf')
+        self.set_cropped_x_y()
+        
+    def set_cropped_x_y(self):
+
+        window_size = self.wincap.window_size
+
+        cell_size_percentage = (0.09247609147609148, 0.09552599758162031)
+        cell_size_w, cell_size_h = int(window_size[0] * cell_size_percentage[0]), int(window_size[1] * cell_size_percentage[1])
+        
+        self.cropped_x = int(cell_size_w + cell_size_w*0.58)
+        self.cropped_y = int(cell_size_h + cell_size_h*0.12)
 
     def to_board_i_j(self, center_x, center_y):
         i = int(center_y / self.cell_size_h)
@@ -76,7 +87,7 @@ class CandyDetector:
         # board_im = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], bottom_right[0], bottom_right[1]))
         # board_im = pyautogui.screenshot(region=(self.top_left[0], self.top_left[1], self.cell_size_w * 9, self.cell_size_h * 9))
 
-        board_im_array = self.wincap.get_screenshot()
+        board_im_array = self.wincap.get_screenshot(self.cropped_x, self.cropped_y)
         
         # board_im_array = cv2.cvtColor(np.asarray(board_im), cv2.COLOR_BGR2RGB)
 

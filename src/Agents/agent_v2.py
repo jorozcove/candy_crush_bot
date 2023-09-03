@@ -136,13 +136,13 @@ class Agent:
         if combo == 'ÑÑ':
             return 1000
         elif combo == 'Ñ_sv' or combo == 'Ñ_sh' or combo == '_svÑ' or combo == '_shÑ':
-            return 800
+            return 1300
         elif combo == 'Ñ_p' or combo == '_pÑ':
             return 500
         elif combo == '_sv_sv' or combo == '_sv_sh' or combo == '_sh_sv' or combo == '_sh_sh':
             return 400
         elif combo == '_sv_p' or combo == '_p_sv' or combo == '_sh_p' or combo == '_p_sh':
-            return 1300
+            return 800
         elif combo == '_p_p':
             return 350
         else:

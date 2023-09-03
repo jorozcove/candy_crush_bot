@@ -20,11 +20,22 @@ class cv2CandySensor:
         self.template_images_special, self.template_images_colors, self.template_images_variants = self.get_templates()
 
         self.wincap = WindowCapture('Ruffle - CandyCrush.swf')
+        self.set_cropped_x_y()
 
         #print board size
         print(f"Board size: {self.cell_size_w * 9}x{self.cell_size_h * 9}")
 
         print(f"Time to load templates: {time.time() - start_time}")
+    
+    def set_cropped_x_y(self):
+
+        window_size = self.wincap.window_size
+
+        cell_size_percentage = (0.09247609147609148, 0.09552599758162031)
+        cell_size_w, cell_size_h = int(window_size[0] * cell_size_percentage[0]), int(window_size[1] * cell_size_percentage[1])
+        
+        self.cropped_x = int(cell_size_w + cell_size_w*0.58)
+        self.cropped_y = int(cell_size_h + cell_size_h*0.12)
 
     def get_templates(self):
         candy_colors = ['blue', 'green', 'orange', 'purple', 'red', 'yellow']
@@ -53,7 +64,7 @@ class cv2CandySensor:
         # im = ImageGrab.grab(bbox=(self.top_left[0], self.top_left[1], bottom_right[0], bottom_right[1]))
         # im = pyautogui.screenshot(region=(self.top_left[0], self.top_left[1], self.cell_size_w * 9, self.cell_size_h * 9))
 
-        im_array = self.wincap.get_screenshot()
+        im_array = self.wincap.get_screenshot(self.cropped_x, self.cropped_y)
 
         #use array slicing on the NumPy array
 

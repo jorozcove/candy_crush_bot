@@ -11,8 +11,6 @@ class WindowCapture:
     hwnd = None
     cropped_x = 0
     cropped_y = 0
-    offset_x = 0
-    offset_y = 0
 
     # constructor
     def __init__(self, window_name):
@@ -27,19 +25,9 @@ class WindowCapture:
         self.h = window_rect[3] - window_rect[1]
 
         # account for the window border and titlebar and cut them off
-        window_size = (self.w, self.h)
-        cell_size_percentage = (0.09247609147609148, 0.09552599758162031)
-        cell_size_w, cell_size_h = int(window_size[0] * cell_size_percentage[0]), int(window_size[1] * cell_size_percentage[1])
+        self.window_size = (self.w, self.h)
 
-        self.cropped_x = int(cell_size_w + cell_size_w*0.58)
-        self.cropped_y = int(cell_size_h + cell_size_h*0.12)
-
-        # set the cropped coordinates offset so we can translate screenshot
-        # images into actual screen positions
-        self.offset_x = window_rect[0] + self.cropped_x
-        self.offset_y = window_rect[1] + self.cropped_y
-
-    def get_screenshot(self):
+    def get_screenshot(self, cropped_x=0, cropped_y=0):
 
         # get the window image data
         wDC = win32gui.GetWindowDC(self.hwnd)
@@ -48,7 +36,7 @@ class WindowCapture:
         dataBitMap = win32ui.CreateBitmap()
         dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
         cDC.SelectObject(dataBitMap)
-        cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
+        cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (cropped_x, cropped_y), win32con.SRCCOPY)
 
         # convert the raw data into a format opencv can read
         #dataBitMap.SaveBitmapFile(cDC, 'debug.bmp')
@@ -84,11 +72,3 @@ class WindowCapture:
             if win32gui.IsWindowVisible(hwnd):
                 print(hex(hwnd), win32gui.GetWindowText(hwnd))
         win32gui.EnumWindows(winEnumHandler, None)
-
-    # translate a pixel position on a screenshot image to a pixel position on the screen.
-    # pos = (x, y)
-    # WARNING: if you move the window being captured after execution is started, this will
-    # return incorrect coordinates, because the window position is only calculated in
-    # the __init__ constructor.
-    def get_screen_position(self, pos):
-        return (pos[0] + self.offset_x, pos[1] + self.offset_y)

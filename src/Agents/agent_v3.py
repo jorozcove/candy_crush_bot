@@ -109,8 +109,10 @@ class Agent:
                 if matrix[i][j] == 'X':
                     for k in range(i, 0, -1):
                         matrix[k][j] = matrix[k-1][j]
-                    matrix[0][j] = None
+                    matrix[0][j] = '?'
         print("Matrix with dropped candies:\n", matrix)
+
+        return matches, matrix
 
     def find_matches(self, matrix):
         matches = []
@@ -138,6 +140,8 @@ class Agent:
         current_position = 0  # Añadir posición inicial
 
         for idx, variant in enumerate(arr[1:], start=1):  # Añadir índice a la enumeración
+            if variant == '?':
+                continue
             if variant != None:
                 variant = variant[0]  # El primer caracter es el color
             if variant == current_variant:
@@ -188,13 +192,13 @@ class Agent:
         if combo == 'ÑÑ':
             return 1000
         elif combo == 'Ñ_sv' or combo == 'Ñ_sh' or combo == '_svÑ' or combo == '_shÑ':
-            return 800
+            return 1300
         elif combo == 'Ñ_p' or combo == '_pÑ':
             return 500
         elif combo == '_sv_sv' or combo == '_sv_sh' or combo == '_sh_sv' or combo == '_sh_sh':
             return 400
         elif combo == '_sv_p' or combo == '_p_sv' or combo == '_sh_p' or combo == '_p_sh':
-            return 1300
+            return 800
         elif combo == '_p_p':
             return 350
         else:
