@@ -5,7 +5,9 @@ from src.Sensors.bgrCandySensor import BgrCandySensor
 
 from src.utils.GameUtils import GameActions
 
-from src.Agents.agent_v2 import Agent
+# from src.Agents.agent import Agent
+# from src.Agents.agent_v2 import Agent
+from src.Agents.agent_v3 import Agent
 
 from datetime import datetime
 from time import sleep

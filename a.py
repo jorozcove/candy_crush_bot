@@ -95,22 +95,22 @@ def findMatches(board, minMatch):
     exclude = ('X', '?')
     for r in range(ROWS):
         for c in range(COLS):
-            if (c >= minMatch-1 and (not board[r][c] in exclude)):
+            if (c >= minMatch-1 and (board[r][c] not  in exclude)):
                 match = findMatch(board, r, c, LEFT)
                 if (match >= minMatch):
                     matched += [(r, x) for x in range(c, c-match, -1)]
 
-            if (c <= COLS-minMatch and (not board[r][c] in exclude)):
+            if (c <= COLS-minMatch and (board[r][c] not in exclude)):
                 match = findMatch(board, r, c, RIGHT)
                 if (match >= minMatch):
                     matched += [(r, x) for x in range(c, c+match)]
 
-            if (r >= minMatch-1 and (not board[r][c] in exclude)):
+            if (r >= minMatch-1 and (board[r][c] not in exclude)):
                 match = findMatch(board, r, c, TOP)
                 if (match >= minMatch):
                     matched += [(x, c) for x in range(r, r-match, -1)]
 
-            if (r <= ROWS-minMatch and (not board[r][c] in exclude)):
+            if (r <= ROWS-minMatch and (board[r][c] not in exclude)):
                 match = findMatch(board, r, c, BOTTOM)
                 if (match >= minMatch):
                     matched += [(x, c) for x in range(r, r+match)]
@@ -118,7 +118,7 @@ def findMatches(board, minMatch):
 
 matrix = np.array([
     ['y', 'g', 'p', 'p', 'g', 'p', 'g', 'b', 'p'],
-    ['r', 'r', 'y', 'y', 'r', 'r', 'r', 'g', 'g'],
+    ['r', 'r', 'y', 'o', 'r', 'r', 'r', 'g', 'g'],
     ['r', 'b', 'y', 'p', 'y', 'p', 'y', 'y', 'y'],
     ['y', 'r', 'p', 'g', 'o', 'p', 'y', 'o', 'r'],
     ['o', 'p', 'b', 'b', 'r', 'o', 'r', 'y', 'g'],
@@ -126,18 +126,18 @@ matrix = np.array([
     ['p', 'y', 'g', 'p', 'y', 'y', 'g', 'r', 'b'],
     ['b', 'y', 'p', 'b', 'y', 'o', 'b', 'o', 'o'],
     ['o', 'b', 'y', 'o', 'b', 'o', 'y', 'g', 'p']
-])
+], dtype="U4")
 
 
-print(sorted(findMatches(matrix, 3), key=lambda x: x[0]))
+# print(sorted(findMatches(matrix, 3), key=lambda x: x[0]))
 
-print(">>>>>>>>>")
+# print(">>>>>>>>>")
 
 agent = Agent()
 agent.set_game_matrix(matrix)
 
-matches = agent.find_matches(matrix)
+matches = agent.find_matches(matrix, 1, 6)
 print(sorted(matches , key=lambda x: x[0]))
 
-while len(matches) > 0:
-    matches, matrix = agent.simulate_result(matrix)
+while matches:
+    matches, matrix = agent.simulate_result(matrix, 1, 6)

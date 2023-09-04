@@ -55,24 +55,31 @@ class Agent:
         # Obtener la nueva posición
         k, m = moves[move]["new_pos"]
         
-        candy = matrix[k][m]
+        #<<<<<<<<<<<<<
+        # candy = matrix[k][m]
         
-        # Coincidencias horizontales
-        count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[k])[0])
-        update_score_and_pos(count_dict['3'] * 60)
-        update_score_and_pos(count_dict['4'] * 100)
-        update_score_and_pos(count_dict['5'] * 150)
-
-        # count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[i]))
+        # # Coincidencias horizontales
+        # count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[k])[0])
         # update_score_and_pos(count_dict['3'] * 60)
-        # update_score_and_pos(count_dict['4'] * 100)
-        # update_score_and_pos(count_dict['5'] * 150)
+        # update_score_and_pos(count_dict['4'] * 120)
+        # update_score_and_pos(count_dict['5'] * 200)
 
-        # Coincidencias verticales
-        count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[:, m])[0])
-        update_score_and_pos(count_dict['3'] * 60)
-        update_score_and_pos(count_dict['4'] * 100)
-        update_score_and_pos(count_dict['5'] * 150)
+        # # count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[i]))
+        # # update_score_and_pos(count_dict['3'] * 60)
+        # # update_score_and_pos(count_dict['4'] * 100)
+        # # update_score_and_pos(count_dict['5'] * 150)
+
+        # # Coincidencias verticales
+        # count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[:, m])[0])
+        # update_score_and_pos(count_dict['3'] * 60)
+        # update_score_and_pos(count_dict['4'] * 120)
+        # update_score_and_pos(count_dict['5'] * 200)
+        # >>>>>>>>>>>>
+
+        matches = self.find_matches(matrix, k, m)
+
+        while matches:
+            matches, matrix = self.simulate_result(matrix, k, m, update_score_and_pos)
 
         # self.simulate_result(matrix, i, j, moves, move, m, k, update_score_and_pos)
 
@@ -84,25 +91,20 @@ class Agent:
 
         return score, new_pos
     
-    def simulate_result(self, matrix):
+    def simulate_result(self, matrix, actual_row, actual_col, update_score_and_pos):
         """
             Having the matrix with the matches, remove the candies and drop the ones above
 
             matrix: The matrix with the matches
-            i: The row of the candy
-            j: The column of the candy
-            moves: The dictionary with the possible moves
-            move: The move to be made
-            m: The column of the candy to be swapped
-            ok: The row of the candy to be swapped
-            update_score_and_pos: The function to update the score and the new position
+            actual_row: The row of the candy that was moved
+            actual_col: The column of the candy that was moved
         """
-        matches = self.find_matches(matrix)
-        print("Matches:", matches)
+        matches = self.find_matches(matrix, actual_row, actual_col, update_score_and_pos)
         # Replace the matches with "X"
         for match in matches:
-            matrix[match] = 'X'
-        print("Matrix with X:\n", matrix)
+            if match[2] is not None: 
+                matrix[match[0:2]] = match[2] 
+            else: matrix[match[0:2]] = 'X'
         # Drop the candies above
         for i in range(9):
             for j in range(9):
@@ -110,24 +112,35 @@ class Agent:
                     for k in range(i, 0, -1):
                         matrix[k][j] = matrix[k-1][j]
                     matrix[0][j] = '?'
-        print("Matrix with dropped candies:\n", matrix)
 
         return matches, matrix
 
-    def find_matches(self, matrix):
+    def find_matches(self, matrix, actual_row, actual_col, update_score_and_pos = None):
         matches = []
         for i in range(9):
-            row_mcc = self.max_consecutive_candies(matrix[i])[1]
-            if i == 1 or i == 2:
-                print("Row:", row_mcc)
-            for j in range(9):
-                col_mcc = self.max_consecutive_candies(matrix[:, j])[1]
-                for x in row_mcc:
-                    for k in range(x[2], x[2]+x[1]):
-                        matches.append((i, k))
-                for x in col_mcc:
-                    for k in range(x[2], x[2]+x[1]):
-                        matches.append((k, j))
+            row_mcc, row_matches = self.max_consecutive_candies(matrix[i])
+            if update_score_and_pos is not None:
+                count_dict = self.count_consecutive_candies(row_mcc)
+                update_score_and_pos(count_dict['3'] * 60)
+                update_score_and_pos(count_dict['4'] * 120)
+                update_score_and_pos(count_dict['5'] * 200)
+            for x in row_matches:
+                for k in range(x[2], x[2]+x[1]):
+                    if x[1] == 4 and (i, k) == (actual_row, actual_col) and len(x[0]) == 1 and x[0] != "Ñ": matches.append((i, k, f"{x[0]}_sh"))
+                    elif x[1] == 5 and (i, k) == (actual_row, actual_col) and len(x[0]) == 1 and x[0] != "Ñ": matches.append((i, k, "Ñ"))
+                    else: matches.append((i, k, None))
+        for j in range(9):
+            col_mcc, col_matches = self.max_consecutive_candies(matrix[:, j])
+            if update_score_and_pos is not None:
+                count_dict = self.count_consecutive_candies(col_mcc)
+                update_score_and_pos(count_dict['3'] * 60)
+                update_score_and_pos(count_dict['4'] * 120)
+                update_score_and_pos(count_dict['5'] * 200)
+            for x in col_matches:
+                for k in range(x[2], x[2]+x[1]):
+                    if x[1] == 4 and (k, j) == (actual_row, actual_col): matches.append((k, j, f"{x[0]}_sv"))
+                    elif x[1] == 5 and (k, j) == (actual_row, actual_col): matches.append((k, j, "Ñ"))
+                    else: matches.append((k, j, None))
         return set(matches)
 
     def max_consecutive_candies(self, arr):
@@ -190,17 +203,17 @@ class Agent:
     
     def score_combo(self, combo):
         if combo == 'ÑÑ':
-            return 1000
+            return 4740
         elif combo == 'Ñ_sv' or combo == 'Ñ_sh' or combo == '_svÑ' or combo == '_shÑ':
-            return 1300
+            return 3000
         elif combo == 'Ñ_p' or combo == '_pÑ':
-            return 500
+            return 1440
         elif combo == '_sv_sv' or combo == '_sv_sh' or combo == '_sh_sv' or combo == '_sh_sh':
-            return 400
+            return 1080
         elif combo == '_sv_p' or combo == '_p_sv' or combo == '_sh_p' or combo == '_p_sh':
-            return 800
+            return 2160
         elif combo == '_p_p':
-            return 350
+            return 2160
         else:
             return 0           
 
