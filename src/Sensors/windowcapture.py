@@ -27,14 +27,20 @@ class WindowCapture:
         # account for the window border and titlebar and cut them off
         self.window_size = (self.w, self.h)
 
-    def get_screenshot(self, cropped_x=0, cropped_y=0):
+    def get_screenshot(self, cropped_x=0, cropped_y=0, cropped_w=0, cropped_h=0):
+
+        if cropped_w == 0:
+            cropped_w = self.w
+
+        if cropped_h == 0:
+            cropped_h = self.h
 
         # get the window image data
         wDC = win32gui.GetWindowDC(self.hwnd)
         dcObj = win32ui.CreateDCFromHandle(wDC)
         cDC = dcObj.CreateCompatibleDC()
         dataBitMap = win32ui.CreateBitmap()
-        dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
+        dataBitMap.CreateCompatibleBitmap(dcObj, cropped_w, cropped_h)
         cDC.SelectObject(dataBitMap)
         cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (cropped_x, cropped_y), win32con.SRCCOPY)
 
@@ -42,7 +48,7 @@ class WindowCapture:
         #dataBitMap.SaveBitmapFile(cDC, 'debug.bmp')
         signedIntsArray = dataBitMap.GetBitmapBits(True)
         img = np.fromstring(signedIntsArray, dtype='uint8')
-        img.shape = (self.h, self.w, 4)
+        img.shape = (cropped_h, cropped_w, 4)
 
         # free resources
         dcObj.DeleteDC()

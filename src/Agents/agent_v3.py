@@ -38,6 +38,7 @@ class Agent:
             return 0, None
 
         # Obtener movimientos que sean combos
+        # print(moves[move]["swap"])
         if self.is_special_candy(matrix[moves[move]["swap"]]) and self.is_special_candy(matrix[i][j]):
             combo = self.get_combo(matrix[moves[move]["swap"]], matrix[i][j])
 
@@ -54,39 +55,12 @@ class Agent:
         # Obtener la nueva posición
         k, m = moves[move]["new_pos"]
         
-        #<<<<<<<<<<<<<
-        # candy = matrix[k][m]
-        
-        # # Coincidencias horizontales
-        # count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[k])[0])
-        # update_score_and_pos(count_dict['3'] * 60)
-        # update_score_and_pos(count_dict['4'] * 120)
-        # update_score_and_pos(count_dict['5'] * 200)
-
-        # # count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[i]))
-        # # update_score_and_pos(count_dict['3'] * 60)
-        # # update_score_and_pos(count_dict['4'] * 100)
-        # # update_score_and_pos(count_dict['5'] * 150)
-
-        # # Coincidencias verticales
-        # count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[:, m])[0])
-        # update_score_and_pos(count_dict['3'] * 60)
-        # update_score_and_pos(count_dict['4'] * 120)
-        # update_score_and_pos(count_dict['5'] * 200)
-        # >>>>>>>>>>>>
-
+        # Obtener las coincidencias (lineas de 3, 4 o 5)
         matches = self.find_matches(matrix, k, m)
 
+        # Mientras haya coincidencias, simular el resultado
         while matches:
             matches, matrix = self.simulate_result(matrix, k, m, update_score_and_pos)
-
-        # self.simulate_result(matrix, i, j, moves, move, m, k, update_score_and_pos)
-
-        # count_dict = self.count_consecutive_candies(self.max_consecutive_candies(matrix[:, j]))
-        # update_score_and_pos(count_dict['3'] * 60)
-        # update_score_and_pos(count_dict['4'] * 100)
-        # update_score_and_pos(count_dict['5'] * 150)
-        
 
         return score, new_pos
     
@@ -240,32 +214,3 @@ class Agent:
             raise Exception("Game matrix not found")
         self.compute_best_move()
         return self.best_move
-
-
-# # Coincidencias horizontales
-# if m >= 2 and matrix[k][m-2] == matrix[k][m-1] == matrix[k][m]:
-#     update_score_and_pos(80 if m >= 3 else 60)  # Línea de 4 o más
-# elif m >= 1 and m <= 6 and matrix[k][m-1] == matrix[k][m] == matrix[k][m+1]:
-#     update_score_and_pos(80)  # Línea de 3 con medio
-# elif m <= 5 and matrix[k][m] == matrix[k][m+1] == matrix[k][m+2]:
-#     update_score_and_pos(80 if m <= 4 else 60)  # Línea de 4 o más
-
-# # Coincidencias verticales
-# elif k >= 2 and matrix[k-2][m] == matrix[k-1][m] == matrix[k][m]:
-#     update_score_and_pos(80 if k >= 3 else 60)  # Línea de 4 o más
-# elif k >= 1 and k <= 6 and matrix[k-1][m] == matrix[k][m] == matrix[k+1][m]:
-#     update_score_and_pos(80)  # Línea de 3 con medio
-# elif k <= 5 and matrix[k][m] == matrix[k+1][m] == matrix[k+2][m]:
-#     update_score_and_pos(80 if k <= 4 else 60)  # Línea de 4 o más
-
-
-# Coincidencias de dulces especiales y combinaciones
-# elif color == 'Ñ':
-#     # Manejar dulce especial de chocolate
-#     # Añadir lógica aquí para priorizar el intercambio con otro dulce especial
-#     pass
-# elif color.endswith('_sv') or color.endswith('_sh') or color.endswith('_p'):
-#     # Manejar variantes de dulces especiales
-#     # Añadir lógica aquí para priorizar el intercambio con otro dulce especial
-#     pass
-
