@@ -14,6 +14,10 @@ from time import sleep
 import keyboard
 import cv2
 
+import numpy as np
+
+
+
 def main():
 
     # init game actions
@@ -23,7 +27,7 @@ def main():
         templates_main_path = 'src/candy_templates/candies'
     )
 
-    actions.open_game(delay = 11)
+    actions.open_game(delay = 10)
     actions.skip_intro()
 
     max_time = 4*60 + 12
@@ -40,23 +44,35 @@ def main():
 
     # Bot loop
     while keyboard.is_pressed('q') == False:
-
+        
         # Get game matrix
         # actions.pause_game() #pause game
-        candy_matrix = candy_sensor.get_candy_matrix()   
-        print(candy_matrix)
+        candy_matrix, img = candy_sensor.get_candy_matrix() 
 
-        # Set game matrix to agent
-        candy_agent.set_game_matrix(candy_matrix)
+        if candy_sensor.game_is_over(candy_matrix):
+            print("Game over")
+            break
+          
+        if not candy_sensor.board_is_moving(candy_matrix, threshold = 5):
+            print(candy_matrix)
 
-        # Get best move and execute it
-        mov_data = candy_agent.play()
-        # sleep(0.01)
-        # actions.pause_game() #unpause game
+            # Set game matrix to agent
+            candy_agent.set_game_matrix(candy_matrix)
 
-        if mov_data is not None:
-            i, j, direction = mov_data
-            actions.swap_cells(i, j, direction)        
+            # Get best move and execute it
+            mov_data = candy_agent.play()
+            # sleep(0.01)
+            # actions.pause_game() #unpause game
+
+            if mov_data is not None:
+                i, j, direction = mov_data
+                actions.swap_cells(i, j, direction)
+        else:
+            print("Board is moving...")
+            #print all '?' coordinates using np.where
+
+            unknowns = np.where(candy_matrix == '?')
+            print(unknowns)
 
         # Check if user wants to pause
         if keyboard.is_pressed('p'):
@@ -64,21 +80,21 @@ def main():
             sleep(3)
 
         # Check if time is over
-        if (datetime.now() - start_time).total_seconds() > max_time:
-            print("Time out")
-            break
+        # if (datetime.now() - start_time).total_seconds() > max_time:
+        #     print("Time out")
+        #     break
+
 
         cv2.waitKey(1)
 
     cv2.destroyAllWindows()
 
-    sleep(10)
+    sleep(8)
 
     # Take screenshot of score
     score_im_array = candy_sensor.wincap.get_screenshot()
     cv2.imwrite(f"src/score_screenshots/score_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png", score_im_array)
 
-    sleep(5)
     # Close game
     actions.close_game()
 
