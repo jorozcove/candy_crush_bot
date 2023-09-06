@@ -38,7 +38,6 @@ class Agent:
             return 0, None
 
         # Obtener movimientos que sean combos
-        print(moves[move]["swap"])
         if self.is_special_candy(matrix[moves[move]["swap"]]) and self.is_special_candy(matrix[i][j]):
             combo = self.get_combo(matrix[moves[move]["swap"]], matrix[i][j])
 
