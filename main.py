@@ -30,54 +30,72 @@ def main():
     actions.open_game(delay = 10)
     actions.skip_intro()
 
+    # while keyboard.is_pressed('i') == False:
+    #     print("Press 'i' to start")
+    #     pass
+    
+    # sleep(5)
+
     max_time = 4*60 + 12
     start_time = datetime.now()
 
     
-    # Create sensor object
+    # Create sensor objectp
     # candy_sensor = cv2CandySensor(*actions.get_board_data())
     # candy_sensor = CandyDetector(*actions.get_board_data())
-    candy_sensor = BgrCandySensor(*actions.get_board_data())
+    candy_sensor = BgrCandySensor()
 
     # init agent
     candy_agent = Agent() 
 
+    prev_mov_data = (0, 0, 'up')
+
+    repeated_moves = 0
+
     # Bot loop
     while keyboard.is_pressed('q') == False:
+
+        # Check if user wants to pause the bot
+        if keyboard.is_pressed('p'):
+            print("Paused...")
+            sleep(3)
         
         # Get game matrix
         # actions.pause_game() #pause game
         candy_matrix, img = candy_sensor.get_candy_matrix() 
 
-        if candy_sensor.game_is_over(candy_matrix):
-            print("Game over")
-            break
+        # if candy_sensor.game_is_over():
+        #     print("Game over")
+        #     break
           
         if not candy_sensor.board_is_moving(candy_matrix, threshold = 5):
-            print(candy_matrix)
+            
 
             # Set game matrix to agent
             candy_agent.set_game_matrix(candy_matrix)
 
             # Get best move and execute it
             mov_data = candy_agent.play()
+            
             # sleep(0.01)
             # actions.pause_game() #unpause game
 
             if mov_data is not None:
-                i, j, direction = mov_data
-                actions.swap_cells(i, j, direction)
+                if mov_data == prev_mov_data:
+                    print("Movimiento repetido")
+                    print(mov_data, prev_mov_data)
+                    prev_mov_data = (0, 0, 'up')
+                    repeated_moves += 1
+                    
+                else:
+                    print(candy_matrix)
+                    i, j, direction = mov_data
+                    actions.swap_cells(i, j, direction)
+                    prev_mov_data = mov_data
+            
         else:
             print("Board is moving...")
-            #print all '?' coordinates using np.where
 
-            unknowns = np.where(candy_matrix == '?')
-            print(unknowns)
-
-        # Check if user wants to pause
-        if keyboard.is_pressed('p'):
-            print("Paused...")
-            sleep(3)
 
         # Check if time is over
         # if (datetime.now() - start_time).total_seconds() > max_time:
@@ -87,6 +105,7 @@ def main():
 
         cv2.waitKey(1)
 
+    print(f"Repeated moves: {repeated_moves}")
     cv2.destroyAllWindows()
 
     sleep(8)
