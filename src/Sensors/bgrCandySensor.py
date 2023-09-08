@@ -13,16 +13,7 @@ def debugImg(img):
             break
 
 class BgrCandySensor:
-    def __init__(self, x, y, cell_size_w, cell_size_h, templates_path):
-        self.snapshot_area = {
-            'top': y,
-            'left': x,
-            'width': cell_size_w * 9,
-            'height': cell_size_h * 9
-        }
-
-        self.cell_size_w = cell_size_w
-        self.cell_size_h = cell_size_h
+    def __init__(self):
 
         # self.colors_bgr = { 
         #   "r": (1, 2, 246), "r_sh": (59,  59, 236), "r_sv": (78,  80, 237), "r_p": (36, 35, 253),
@@ -45,17 +36,20 @@ class BgrCandySensor:
          }
         
         self.wincap = WindowCapture('Ruffle - CandyCrush.swf')
-        self.set_cropped_x_y()
+        self.set_board_values()
     
-    def set_cropped_x_y(self):
-
+    def set_board_values(self):
+        self.wincap.set_window_size()
         window_size = self.wincap.window_size
 
         cell_size_percentage = (0.09247609147609148, 0.09552599758162031)
         cell_size_w, cell_size_h = int(window_size[0] * cell_size_percentage[0]), int(window_size[1] * cell_size_percentage[1])
         
-        self.cropped_x = int(cell_size_w + cell_size_w*0.58)
-        self.cropped_y = int(cell_size_h + cell_size_h*0.12)
+        self.board_x = int(cell_size_w + cell_size_w*0.58)
+        self.board_y = int(cell_size_h + cell_size_h*0.12)
+
+        self.cell_size_w = cell_size_w
+        self.cell_size_h = cell_size_h
 
     def bgr_mean(self, bgr_img):
         color_mean = np.average(bgr_img, axis = 0)
@@ -89,20 +83,20 @@ class BgrCandySensor:
         return np.count_nonzero(candy_matrix == '?') > threshold
     
     def get_color(self, i, j):
-        image = self.wincap.get_screenshot(self.cropped_x, self.cropped_y)
+        image = self.wincap.get_screenshot(self.board_x, self.board_y, self.cell_size_w*9, self.cell_size_h*9)
         colorVal = self.get_bgr_mean(i, j, image)
         colorName = self.categorize_color(colorVal)
 
         return colorVal, colorName
     
     #check if game is over by checking if there is the close button in the bottom left corner
-    def game_is_over(self, candy_matrix):
+    def game_is_over(self):
 
         img = self.wincap.get_screenshot(
-            cropped_x = 0,
-            cropped_y = self.cropped_y + int(8.6 * self.cell_size_h),
-            cropped_w = int(self.cell_size_w * 0.6),
-            cropped_h = int(self.cell_size_h * 1.5)
+            x = 0,
+            y = self.board_y + int(8.6 * self.cell_size_h),
+            w = int(self.cell_size_w * 0.6),
+            h = int(self.cell_size_h * 1.5)
         )
         
         close_bttn_bgr = (25, 27, 52)
@@ -121,10 +115,11 @@ class BgrCandySensor:
     # Read pixel colors from game screen and initialize candy_matrix
     def get_candy_matrix(self):
         start_time = datetime.now()
+        self.set_board_values()
 
         candy_matrix = np.empty((9, 9), dtype=object)
 
-        image = self.wincap.get_screenshot(self.cropped_x, self.cropped_y)
+        image = self.wincap.get_screenshot(self.board_x, self.board_y, self.cell_size_w*9, self.cell_size_h*9)
         for r in range(9):
             for c in range(9):
                 color_val = self.get_bgr_mean(r, c, image)
