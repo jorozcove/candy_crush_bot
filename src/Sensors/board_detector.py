@@ -26,4 +26,5 @@ def get_board_data():
 
     x_board, y_board = x + int(cell_size_w + cell_size_w*0.58), y + int(cell_size_h + cell_size_h*0.12)
 
+    print(f'Board data: {x_board}, {y_board}, {cell_size_w}, {cell_size_h}')
     return x_board, y_board, cell_size_w, cell_size_h

@@ -15,41 +15,47 @@ def debugImg(img):
 class BgrCandySensor:
     def __init__(self):
 
-        # self.colors_bgr = { 
-        #   "r": (1, 2, 246), "r_sh": (59,  59, 236), "r_sv": (78,  80, 237), "r_p": (36, 35, 253),
-        #   "g" : (2, 181, 54), "g_sh": ( 74, 233, 111), "g_sv": (107, 242, 143), "g_p": (47, 229, 91),
-        #   "b": (252, 152,  46), "b_sh": (236, 186,  75), "b_sv": (246, 196, 109),"b_p": (254, 190,  37),
-        #   "y": (12, 225, 252),  "y_sh": (96, 226, 251), "y_sv": (94, 224, 252), "y_p": (51, 225, 255),
-        #   "p": (255,  37, 199), "p_sh": (243,  92, 217), "p_sv": (245, 102, 217), "p_p": (255,  40, 206),
-        #   "o": (35, 155, 255), "o_sh" : (94, 192, 249), "o_sv": (102, 197, 248), "o_p" : (30, 170, 255),
-        #   "Ñ": (45, 69, 112)
-        #  }
-
         self.colors_bgr = { 
-          "r": (1, 2, 246), "r_sh": (72,  74, 243), "r_sv": (99, 102, 246), "r_p": (36, 35, 253),
-          "g" : (2, 181, 54), "g_sh": ( 62, 225, 101), "g_sv": (79, 228, 116), "g_p": (47, 229, 91),
-          "b": (252, 152,  46), "b_sh": (236, 186,  75), "b_sv": (244, 183,  79),"b_p": (254, 190,  37),
-          "y": (12, 225, 252),  "y_sh": (66, 217, 251), "y_sv": (67, 216, 251), "y_p": (51, 225, 255),
-          "p": (255,  37, 199), "p_sh": (243, 102, 217), "p_sv": (245, 102, 217), "p_p": (255,  40, 206),
-          "o": (35, 155, 255), "o_sh" : (112, 197, 249), "o_sv": (129, 207, 250), "o_p" : (30, 170, 255),
+          "r": (1, 2, 246), "r_sh": (59,  59, 236), "r_sv": (78,  80, 237), "r_p": (36, 35, 253),
+          "g" : (2, 181, 54), "g_sh": ( 74, 233, 111), "g_sv": (107, 242, 143), "g_p": (47, 229, 91),
+          "b": (252, 152,  46), "b_sh": (236, 186,  75), "b_sv": (246, 196, 109),"b_p": (254, 190,  37),
+          "y": (12, 225, 252),  "y_sh": (96, 226, 251), "y_sv": (94, 224, 252), "y_p": (51, 225, 255),
+          "p": (255,  37, 199), "p_sh": (243,  92, 217), "p_sv": (245, 102, 217), "p_p": (255,  40, 206),
+          "o": (35, 155, 255), "o_sh" : (94, 192, 249), "o_sv": (102, 197, 248), "o_p" : (30, 170, 255),
           "Ñ": (45, 69, 112)
          }
+
+        # self.colors_bgr = { 
+        #   "r": (1, 2, 246), "r_sh": (72,  74, 243), "r_sv": (99, 102, 246), "r_p": (36, 35, 253),
+        #   "g" : (2, 181, 54), "g_sh": ( 62, 225, 101), "g_sv": (79, 228, 116), "g_p": (47, 229, 91),
+        #   "b": (252, 152,  46), "b_sh": (236, 186,  75), "b_sv": (244, 183,  79),"b_p": (254, 190,  37),
+        #   "y": (12, 225, 252),  "y_sh": (66, 217, 251), "y_sv": (67, 216, 251), "y_p": (51, 225, 255),
+        #   "p": (255,  37, 199), "p_sh": (243, 102, 217), "p_sv": (245, 102, 217), "p_p": (255,  40, 206),
+        #   "o": (35, 155, 255), "o_sh" : (112, 197, 249), "o_sv": (129, 207, 250), "o_p" : (30, 170, 255),
+        #   "Ñ": (45, 69, 112)
+        #  }
         
         self.wincap = WindowCapture('Ruffle - CandyCrush.swf')
         self.set_board_values()
     
     def set_board_values(self):
-        self.wincap.set_window_size()
+        self.wincap.set_window_values()
         window_size = self.wincap.window_size
 
         cell_size_percentage = (0.09247609147609148, 0.09552599758162031)
         cell_size_w, cell_size_h = int(window_size[0] * cell_size_percentage[0]), int(window_size[1] * cell_size_percentage[1])
         
-        self.board_x = int(cell_size_w + cell_size_w*0.58)
-        self.board_y = int(cell_size_h + cell_size_h*0.12)
+        self.board_relative_x = int(cell_size_w + cell_size_w*0.58)
+        self.board_relative_y = int(cell_size_h + cell_size_h*0.12)
+
+        self.board_x = self.board_relative_x + self.wincap.x
+        self.board_y = self.board_relative_y + self.wincap.y
 
         self.cell_size_w = cell_size_w
         self.cell_size_h = cell_size_h
+
+    def get_board_data(self):
+        return self.board_x, self.board_y, self.cell_size_w, self.cell_size_h
 
     def bgr_mean(self, bgr_img):
         color_mean = np.average(bgr_img, axis = 0)
@@ -83,7 +89,7 @@ class BgrCandySensor:
         return np.count_nonzero(candy_matrix == '?') > threshold
     
     def get_color(self, i, j):
-        image = self.wincap.get_screenshot(self.board_x, self.board_y, self.cell_size_w*9, self.cell_size_h*9)
+        image = self.wincap.get_screenshot(self.board_relative_x, self.board_relative_y, self.cell_size_w*9, self.cell_size_h*9)
         colorVal = self.get_bgr_mean(i, j, image)
         colorName = self.categorize_color(colorVal)
 
@@ -94,7 +100,7 @@ class BgrCandySensor:
 
         img = self.wincap.get_screenshot(
             x = 0,
-            y = self.board_y + int(8.6 * self.cell_size_h),
+            y = self.board_relative_y + int(8.6 * self.cell_size_h),
             w = int(self.cell_size_w * 0.6),
             h = int(self.cell_size_h * 1.5)
         )
@@ -119,7 +125,7 @@ class BgrCandySensor:
 
         candy_matrix = np.empty((9, 9), dtype=object)
 
-        image = self.wincap.get_screenshot(self.board_x, self.board_y, self.cell_size_w*9, self.cell_size_h*9)
+        image = self.wincap.get_screenshot(self.board_relative_x, self.board_relative_y, self.cell_size_w*9, self.cell_size_h*9)
         for r in range(9):
             for c in range(9):
                 color_val = self.get_bgr_mean(r, c, image)

@@ -8,16 +8,13 @@ from time import sleep
 from .resizer import resize_images
 import os
 import subprocess
-from src.Sensors.board_detector import get_board_data
 import keyboard
-
 import pyautogui
 
 class GameActions:
-    def __init__(self, game_path, ruffle_path, templates_main_path):
+    def __init__(self, game_path, ruffle_path):
         self.game_path = game_path
         self.ruffle_path = ruffle_path
-        self.templates_main_path = templates_main_path
 
     def open_game(self, delay = 8):
         # Open game
@@ -25,18 +22,18 @@ class GameActions:
 
         # Wait for game to load
         sleep(delay)
-
-        # Get board data, resize images if needed
-        x, y, cell_size_w, cell_size_h = get_board_data() 
-        templates_path = os.path.join(os.getcwd(), f'{self.templates_main_path}{cell_size_w}x{cell_size_h}')
-        if not os.path.exists(templates_path):
-            print(f"Resizing images to {cell_size_w}x{cell_size_h}")
-            templates_path = resize_images(w = cell_size_w, h = cell_size_h, path = self.templates_main_path)
-
+    
+    def set_board_values(self, x, y, cell_size_w, cell_size_h):
         self.x = x
         self.y = y
         self.cell_size_w = cell_size_w
         self.cell_size_h = cell_size_h
+        
+    def resize_images(self, templates_main_path):
+        templates_path = os.path.join(os.getcwd(), f'{templates_main_path}{cell_size_w}x{cell_size_h}')
+        if not os.path.exists(templates_path):
+            print(f"Resizing images to {cell_size_w}x{cell_size_h}")
+            templates_path = resize_images(w = cell_size_w, h = cell_size_h, path = self.templates_main_path)
         self.templates_path = templates_path
 
     def skip_intro(self):
@@ -53,9 +50,6 @@ class GameActions:
     def close_game(self):
         # Close game
         subprocess.Popen(['taskkill', '/F', '/IM', 'ruffle.exe'])
-
-    def get_board_data(self):
-        return self.x, self.y, self.cell_size_w, self.cell_size_h, self.templates_path
 
     def click(self, x, y):
         # win32api.SetCursorPos((x, y))

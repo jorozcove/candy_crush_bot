@@ -16,19 +16,13 @@ import cv2
 
 import numpy as np
 
-
-
 def main():
 
     # init game actions
     actions = GameActions(
         game_path = 'src/Game/ruffle.exe',
-        ruffle_path = 'src/Game/CandyCrush.swf',
-        templates_main_path = 'src/candy_templates/candies'
+        ruffle_path = 'src/Game/CandyCrush.swf'
     )
-
-    actions.open_game(delay = 10)
-    actions.skip_intro()
 
     # while keyboard.is_pressed('i') == False:
     #     print("Press 'i' to start")
@@ -39,11 +33,14 @@ def main():
     max_time = 4*60 + 12
     start_time = datetime.now()
 
-    
+    actions.open_game(delay = 10)
+
     # Create sensor objectp
     # candy_sensor = cv2CandySensor(*actions.get_board_data())
     # candy_sensor = CandyDetector(*actions.get_board_data())
     candy_sensor = BgrCandySensor()
+    actions.set_board_values(*candy_sensor.get_board_data())
+    actions.skip_intro()
 
     # init agent
     candy_agent = Agent() 
@@ -62,7 +59,8 @@ def main():
         
         # Get game matrix
         # actions.pause_game() #pause game
-        candy_matrix, img = candy_sensor.get_candy_matrix() 
+        candy_matrix, img = candy_sensor.get_candy_matrix()
+        actions.set_board_values(*candy_sensor.get_board_data())
 
         # if candy_sensor.game_is_over():
         #     print("Game over")

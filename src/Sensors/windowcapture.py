@@ -20,12 +20,16 @@ class WindowCapture:
             raise Exception('Window not found: {}'.format(window_name))
 
         # get the window size
-        self.set_window_size()
+        self.set_window_values()
 
-    def set_window_size(self):
+    def set_window_values(self):
         window_rect = win32gui.GetWindowRect(self.window_hwnd)
-        self.window_w = window_rect[2] - window_rect[0]
-        self.window_h = window_rect[3] - window_rect[1]
+
+        self.x = window_rect[0]
+        self.y = window_rect[1]
+
+        self.window_w = window_rect[2] - self.x
+        self.window_h = window_rect[3] - self.y
 
         self.window_size = (self.window_w, self.window_h)
 
