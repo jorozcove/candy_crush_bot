@@ -127,6 +127,7 @@ class Agent:
 
         for idx, variant in enumerate(arr[1:], start=1):  # Añadir índice a la enumeración
             if variant == '?':
+                current_count = 1
                 continue
             if variant != None:
                 variant = variant[0]  # El primer caracter es el color
