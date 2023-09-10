@@ -13,7 +13,7 @@ def debugImg(img):
             break
 
 class BgrCandySensor:
-    def __init__(self):
+    def __init__(self, window_name):
 
         self.colors_bgr = { 
           "r": (1, 2, 246), "r_sh": (59,  59, 236), "r_sv": (78,  80, 237), "r_p": (36, 35, 253),
@@ -35,7 +35,7 @@ class BgrCandySensor:
         #   "Ñ": (45, 69, 112)
         #  }
         
-        self.wincap = WindowCapture('Ruffle - CandyCrush.swf')
+        self.wincap = WindowCapture(window_name)
         self.set_board_values()
     
     def set_board_values(self):

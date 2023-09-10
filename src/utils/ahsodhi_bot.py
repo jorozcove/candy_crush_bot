@@ -416,24 +416,24 @@ while not win32api.GetAsyncKeyState(ord('Q')) < 0:
     POSSIBLE_SWAPS = {}
     gameboard = [[0 for c in range(COLS)] for r in range(ROWS)]
 
-    #read input
-    opt = input(">>")
-    if (opt != 'a'):
-        i, j = map(int, opt.split())
-        print(get_color(i, j, gameboard))
+    # #read input
+    # opt = input(">>")
+    # if (opt != 'a'):
+    #     i, j = map(int, opt.split())
+    #     print(get_color(i, j, gameboard))
     
-    else:
-        initializeBoard(gameboard)
-        g = np.array(gameboard)
+    # else:
+    #     initializeBoard(gameboard)
+    #     g = np.array(gameboard)
 
-        print(g)
+    #     print(g)
 
-    # initializeBoard(gameboard)
+    initializeBoard(gameboard)
    
-    # #if not '?' in [x for row in gameboard for x in row]:
-    # for i in range(MAX_MATCH, MIN_MATCH-1, -1):
-    #     findPatterns(gameboard, i)
-    #     if len(POSSIBLE_SWAPS.keys()) > 0:
-    #         makeBestMove(gameboard)
-    #         break
+    #if not '?' in [x for row in gameboard for x in row]:
+    for i in range(MAX_MATCH, MIN_MATCH-1, -1):
+        findPatterns(gameboard, i)
+        if len(POSSIBLE_SWAPS.keys()) > 0:
+            makeBestMove(gameboard)
+            break
     
