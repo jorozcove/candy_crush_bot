@@ -16,9 +16,9 @@ class GameActions:
         self.game_path = game_path
         self.ruffle_path = ruffle_path
 
-    def open_game(self, delay = 8):
-        # Open game
-        subprocess.Popen([self.game_path, self.ruffle_path])
+    def open_game(self, fps = '60', delay = 8):
+        # Open game ruffle.exe CandyCrush.swf --frame-rate 100 --open-url-mode deny
+        subprocess.Popen([self.game_path, self.ruffle_path, '--frame-rate', str(fps), '--open-url-mode', 'deny'])
 
         # Wait for game to load
         sleep(delay)
