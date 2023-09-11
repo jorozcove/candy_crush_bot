@@ -1,6 +1,5 @@
 from src.Sensors.bgrCandySensor import BgrCandySensor
 from src.utils.GameUtils import GameActions
-from src.Sensors.board_detector import get_board_data
 import cv2
 
 import pytesseract
@@ -23,9 +22,7 @@ actions = GameActions(
 # actions.open_game(delay = 11)
 # actions.skip_intro()
 
-b_data = get_board_data()
-print(b_data)
-candy_sensor = BgrCandySensor(*b_data, '')
+candy_sensor = BgrCandySensor()
 
 candy_matrix, image = candy_sensor.get_candy_matrix()
 
@@ -51,22 +48,32 @@ while cv2.waitKey(1) != ord('q'):
 
     elif (opt == 'k'):
         #get sceenshot of bottom left corner
-        img = candy_sensor.wincap.get_screenshot(cropped_x = 0,
-                                                cropped_y = candy_sensor.cropped_y + int(8.6 * candy_sensor.cell_size_h),
-                                                cropped_w = int(candy_sensor.cell_size_w * 0.6),
-                                                cropped_h = int(candy_sensor.cell_size_h * 1.5)
-                                                )
+        # img = candy_sensor.wincap.get_screenshot(cropped_x = 0,
+        #                                         cropped_y = candy_sensor.cropped_y + int(8.6 * candy_sensor.cell_size_h),
+        #                                         cropped_w = int(candy_sensor.cell_size_w * 0.6),
+        #                                         cropped_h = int(candy_sensor.cell_size_h * 1.5)
+        #                                         )
         
-        close_bttn_bgr = (25, 27, 52)
-        bgr_mean = candy_sensor.bgr_mean(img)
+        # close_bttn_bgr = (25, 27, 52)
+        # bgr_mean = candy_sensor.bgr_mean(img)
 
-        # compare distance between bgr_mean and close_bttn_bgr
-        manhattan = lambda x,y : abs(x[0] - y[0]) + abs(x[1] - y[1]) + abs(x[2] - y[2])
+        # # compare distance between bgr_mean and close_bttn_bgr
+        # manhattan = lambda x,y : abs(x[0] - y[0]) + abs(x[1] - y[1]) + abs(x[2] - y[2])
 
-        distance = manhattan(bgr_mean, close_bttn_bgr)
+        # distance = manhattan(bgr_mean, close_bttn_bgr)
 
-        print(distance)
-        debugImg(img)   
+        # print(distance)
+        # debugImg(img) 
+
+        #Get screenshot of position (i,j) in gameboard
+        # i, j = map(int, input("i j: ").split())
+        img = candy_sensor.wincap.get_screenshot(
+        #     cropped_x = candy_sensor.cropped_x + j * candy_sensor.cell_size_w,
+        #     cropped_y = candy_sensor.cropped_y + i * candy_sensor.cell_size_h,
+        #     cropped_w = candy_sensor.cell_size_w,
+        #     cropped_h = candy_sensor.cell_size_h
+        )
+        debugImg(img)
 
 
     else:

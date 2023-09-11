@@ -9,51 +9,56 @@ class WindowCapture:
     w = 0
     h = 0
     hwnd = None
-    cropped_x = 0
-    cropped_y = 0
+    x = 0
+    y = 0
 
     # constructor
     def __init__(self, window_name):
         # find the handle for the window we want to capture
-        self.hwnd = win32gui.FindWindow(None, window_name)
-        if not self.hwnd:
+        self.window_hwnd = win32gui.FindWindow(None, window_name)
+        if not self.window_hwnd:
             raise Exception('Window not found: {}'.format(window_name))
 
         # get the window size
-        window_rect = win32gui.GetWindowRect(self.hwnd)
-        self.w = window_rect[2] - window_rect[0]
-        self.h = window_rect[3] - window_rect[1]
+        self.set_window_values()
 
-        # account for the window border and titlebar and cut them off
-        self.window_size = (self.w, self.h)
+    def set_window_values(self):
+        window_rect = win32gui.GetWindowRect(self.window_hwnd)
 
-    def get_screenshot(self, cropped_x=0, cropped_y=0, cropped_w=0, cropped_h=0):
+        self.x = window_rect[0]
+        self.y = window_rect[1]
 
-        if cropped_w == 0:
-            cropped_w = self.w
+        self.window_w = window_rect[2] - self.x
+        self.window_h = window_rect[3] - self.y
 
-        if cropped_h == 0:
-            cropped_h = self.h
+        self.window_size = (self.window_w, self.window_h)
+
+    def get_screenshot(self, x=0, y=0, w=0, h=0):
+        if w == 0:
+            w = self.window_w
+
+        if h == 0:
+            h = self.window_h
 
         # get the window image data
-        wDC = win32gui.GetWindowDC(self.hwnd)
+        wDC = win32gui.GetWindowDC(self.window_hwnd)
         dcObj = win32ui.CreateDCFromHandle(wDC)
         cDC = dcObj.CreateCompatibleDC()
         dataBitMap = win32ui.CreateBitmap()
-        dataBitMap.CreateCompatibleBitmap(dcObj, cropped_w, cropped_h)
+        dataBitMap.CreateCompatibleBitmap(dcObj, w, h)
         cDC.SelectObject(dataBitMap)
-        cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (cropped_x, cropped_y), win32con.SRCCOPY)
+        cDC.BitBlt((0, 0), (w, h), dcObj, (x, y), win32con.SRCCOPY)
 
         # convert the raw data into a format opencv can read
         #dataBitMap.SaveBitmapFile(cDC, 'debug.bmp')
         signedIntsArray = dataBitMap.GetBitmapBits(True)
         img = np.fromstring(signedIntsArray, dtype='uint8')
-        img.shape = (cropped_h, cropped_w, 4)
+        img.shape = (h, w, 4)
 
         # free resources
         dcObj.DeleteDC()
         cDC.DeleteDC()
-        win32gui.ReleaseDC(self.hwnd, wDC)
+        win32gui.ReleaseDC(self.window_hwnd, wDC)
         win32gui.DeleteObject(dataBitMap.GetHandle())
 
         # drop the alpha channel, or cv.matchTemplate() will throw an error like:
