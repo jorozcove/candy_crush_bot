@@ -1,6 +1,7 @@
 from copy import deepcopy
 import itertools
 import time
+from threading import Thread
 
 class Agent:
     def __init__(self):
@@ -188,20 +189,30 @@ class Agent:
         elif combo == '_p_p':
             return 2160
         else:
-            return 0           
+            return 0
+
+    def examine_possible_moves(self, i, j,  possible_moves, max_score=0):
+        for move in possible_moves:
+            score, new_pos = self.decide_best_move(i, j, move)
+
+            if score >= max_score[0]:
+                max_score[0] = score
+                self.best_move = new_pos
 
     def compute_best_move(self):
         start_time = time.time()
-        max_score = 0
+        max_score = [0]
+        threads = []
         for i in range(9):
             for j in range(9):
                 possible_moves = ['up', 'down', 'left', 'right']
-                for move in possible_moves:
-                    score, new_pos = self.decide_best_move(i, j, move)
+                self.examine_possible_moves(i, j, possible_moves, max_score)
+                # thread = Thread(target=self.examine_possible_moves, args=(i, j, possible_moves, max_score))
+                # threads.append(thread)
+                # thread.start()
 
-                    if score >= max_score:
-                        max_score = score
-                        self.best_move = new_pos
+        # for thread in threads:
+        #     thread.join()
         
         print("==================COMBOS==================")
         print(self.combos)

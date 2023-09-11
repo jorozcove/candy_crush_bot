@@ -49,9 +49,9 @@ def main():
         # actions.pause_game() #pause game
         candy_matrix, img = candy_sensor.get_candy_matrix() 
 
-        if candy_sensor.game_is_over(candy_matrix):
-            print("Game over")
-            break
+        # if candy_sensor.game_is_over(candy_matrix):
+        #     print("Game over")
+        #     break
           
         if not candy_sensor.board_is_moving(candy_matrix, threshold = 5):
             print(candy_matrix)
