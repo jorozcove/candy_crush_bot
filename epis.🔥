@@ -1,0 +1,6 @@
+from python import Python
+
+fn main() raises -> None:
+    Python.add_to_path("./")
+    let a = Python.import_module("a")
+    a.test()
