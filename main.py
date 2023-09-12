@@ -19,9 +19,10 @@ import numpy as np
 def main():
 
     # init game actions
+    game_name = 'CandyCrush'#'90_ticks'
     actions = GameActions(
-        game_path = 'src/Game/ruffle.exe',
-        ruffle_path = 'src/Game/CandyCrush.swf'
+        game_path = f'src/Game/{game_name}.swf',
+        ruffle_path = 'src/Game/ruffle.exe'
     )
 
     # while keyboard.is_pressed('i') == False:
@@ -33,12 +34,12 @@ def main():
     max_time = 4*60 + 12
     start_time = datetime.now()
 
-    actions.open_game(fps = 120, delay = 3.5)
+    actions.open_game(fps = 120, delay = 5.5)
 
     # Create sensor object
     # candy_sensor = cv2CandySensor(*actions.get_board_data())
     # candy_sensor = CandyDetector(*actions.get_board_data())
-    candy_sensor = BgrCandySensor('Ruffle - CandyCrush.swf')
+    candy_sensor = BgrCandySensor(f'Ruffle - {game_name}.swf')
     actions.set_board_values(*candy_sensor.get_board_data())
     actions.skip_intro()
 
