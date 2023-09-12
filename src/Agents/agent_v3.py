@@ -1,6 +1,7 @@
 from copy import deepcopy
 import itertools
 import time
+from threading import Thread
 
 class Agent:
     def __init__(self):
@@ -28,9 +29,9 @@ class Agent:
 
         # Realizar el movimiento
         moves = {
-            "up": {"condition": i == 0, "swap": (i-1, j), "new_pos": (i-1, j)},
+            # "up": {"condition": i == 0, "swap": (i-1, j), "new_pos": (i-1, j)},
             "down": {"condition": i == 8, "swap": (i+1, j), "new_pos": (i+1, j)},
-            "left": {"condition": j == 0, "swap": (i, j-1), "new_pos": (i, j-1)},
+            # "left": {"condition": j == 0, "swap": (i, j-1), "new_pos": (i, j-1)},
             "right": {"condition": j == 8, "swap": (i, j+1), "new_pos": (i, j+1)}
         }
 
@@ -59,8 +60,11 @@ class Agent:
         matches = self.find_matches(matrix, k, m)
 
         # Mientras haya coincidencias, simular el resultado
-        while matches:
+        max_iterations = 15
+        iterations = 0
+        while matches and iterations < max_iterations:
             matches, matrix = self.simulate_result(matrix, k, m, update_score_and_pos)
+            iterations += 1
 
         return score, new_pos
     
@@ -189,20 +193,30 @@ class Agent:
         elif combo == '_p_p':
             return 2160
         else:
-            return 0           
+            return 0
+
+    def examine_possible_moves(self, i, j,  possible_moves, max_score=0):
+        for move in possible_moves:
+            score, new_pos = self.decide_best_move(i, j, move)
+
+            if score >= max_score[0]:
+                max_score[0] = score
+                self.best_move = new_pos
 
     def compute_best_move(self):
         start_time = time.time()
-        max_score = 0
+        max_score = [0]
+        threads = []
         for i in range(9):
             for j in range(9):
-                possible_moves = ['up', 'down', 'left', 'right']
-                for move in possible_moves:
-                    score, new_pos = self.decide_best_move(i, j, move)
+                possible_moves = ['down', 'right']#['up', 'down', 'left', 'right']
+                self.examine_possible_moves(i, j, possible_moves, max_score)
+                # thread = Thread(target=self.examine_possible_moves, args=(i, j, possible_moves, max_score))
+                # threads.append(thread)
+                # thread.start()
 
-                    if score >= max_score:
-                        max_score = score
-                        self.best_move = new_pos
+        # for thread in threads:
+        #     thread.join()
         
         print("==================COMBOS==================")
         print(self.combos)
