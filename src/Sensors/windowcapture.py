@@ -14,6 +14,7 @@ class WindowCapture:
 
     # constructor
     def __init__(self, window_name):
+        print("WINDOW CAPTURE INIT ")
         # find the handle for the window we want to capture
         self.window_hwnd = win32gui.FindWindow(None, window_name)
         if not self.window_hwnd:
@@ -83,3 +84,6 @@ class WindowCapture:
             if win32gui.IsWindowVisible(hwnd):
                 print(hex(hwnd), win32gui.GetWindowText(hwnd))
         win32gui.EnumWindows(winEnumHandler, None)
+
+if __name__ == "__main__":
+    pass

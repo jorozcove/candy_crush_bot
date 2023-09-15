@@ -13,7 +13,7 @@ def debugImg(img):
             break
 
 class BgrCandySensor:
-    def __init__(self, window_name):
+    def __init__(self, window_name, use_ruffle = True):
 
         self.colors_bgr = { 
           "r": (1, 2, 246), "r_sh": (59,  59, 236), "r_sv": (78,  80, 237), "r_p": (36, 35, 253),
@@ -36,11 +36,17 @@ class BgrCandySensor:
         #  }
         
         self.wincap = WindowCapture(window_name)
+        
+
+        self.y_offset = 0 if use_ruffle else -28
+
         self.set_board_values()
+
     
     def set_board_values(self):
         self.wincap.set_window_values()
         window_size = self.wincap.window_size
+        print(f"WINDOW SIZE: {window_size}")
 
         cell_size_percentage = (0.09247609147609148, 0.09552599758162031)
         cell_size_w, cell_size_h = int(window_size[0] * cell_size_percentage[0]), int(window_size[1] * cell_size_percentage[1])
@@ -53,6 +59,9 @@ class BgrCandySensor:
 
         self.cell_size_w = cell_size_w
         self.cell_size_h = cell_size_h
+
+        #add offset to board_relative_y
+        self.board_relative_y += self.y_offset
 
     def get_board_data(self):
         return self.board_x, self.board_y, self.cell_size_w, self.cell_size_h
@@ -126,6 +135,7 @@ class BgrCandySensor:
         candy_matrix = np.empty((9, 9), dtype=object)
 
         image = self.wincap.get_screenshot(self.board_relative_x, self.board_relative_y, self.cell_size_w*9, self.cell_size_h*9)
+
         for r in range(9):
             for c in range(9):
                 color_val = self.get_bgr_mean(r, c, image)

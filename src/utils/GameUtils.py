@@ -2,8 +2,6 @@
 import sys
 sys.path.append("..")
 
-import win32api
-import win32con
 from time import sleep
 from .resizer import resize_images
 import os
@@ -11,14 +9,26 @@ import subprocess
 import keyboard
 import pyautogui
 
+import win32api, win32con
+
 class GameActions:
-    def __init__(self, game_path, ruffle_path):
+    def __init__(self, game_path, ruffle_path, window_name, ruffle = True):
         self.game_path = game_path
         self.ruffle_path = ruffle_path
+        self.ruffle = ruffle
+        self.window_name = window_name
 
     def open_game(self, fps = '60', delay = 8):
         # Open game ruffle.exe CandyCrush.swf --frame-rate 100 --open-url-mode deny
-        subprocess.Popen([self.ruffle_path, self.game_path, '--frame-rate', str(fps), '--open-url-mode', 'deny'])
+        if self.ruffle:
+            subprocess.Popen([self.ruffle_path, self.game_path, '--frame-rate', str(fps), '--open-url-mode', 'deny'])
+        else:
+            subprocess.Popen([self.game_path])
+
+        # Resize and move window  
+        # sleep(1)
+        # window_handle = win32gui.FindWindow(None, self.window_name)
+        # win32gui.MoveWindow(window_handle, 0, 0, 964, 800, True)  
 
         # Wait for game to load
         sleep(delay)
@@ -84,3 +94,6 @@ class GameActions:
             self.click_cell(cell_i, cell_j)
             # sleep(0.05)
             self.click_cell(cell_i, cell_j + 1)
+
+if __name__ == "__main__":
+    pass

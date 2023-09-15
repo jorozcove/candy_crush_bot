@@ -13,16 +13,28 @@ def debugImg(img):
             cv2.destroyAllWindows()
             break
 
+# actions = GameActions(
+#     game_path = 'src/Game/ruffle.exe',
+#     ruffle_path = 'src/Game/CandyCrush.swf',
+#     templates_main_path = 'src/candy_templates/candies'
+# )
+
+game_name = 'candy-crush.exe'
+use_ruffle = False
+
+window_name = f'Ruffle - {game_name}' if use_ruffle else 'Adobe Flash Player 10'
+
 actions = GameActions(
-    game_path = 'src/Game/ruffle.exe',
-    ruffle_path = 'src/Game/CandyCrush.swf',
-    templates_main_path = 'src/candy_templates/candies'
+    game_path = f'src/Game/{game_name}',
+    ruffle_path = 'src/Game/ruffle.exe',
+    window_name = window_name,
+    ruffle = use_ruffle
 )
 
 # actions.open_game(delay = 11)
 # actions.skip_intro()
 
-candy_sensor = BgrCandySensor()
+candy_sensor = BgrCandySensor(window_name, use_ruffle=use_ruffle)
 
 candy_matrix, image = candy_sensor.get_candy_matrix()
 

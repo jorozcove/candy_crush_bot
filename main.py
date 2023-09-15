@@ -1,4 +1,4 @@
-# from src.Sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
+from src.Sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
 from src.Sensors.cv2CandySensor import cv2CandySensor
 from src.Sensors.CandyDetector_v2 import CandyDetector
 from src.Sensors.bgrCandySensor import BgrCandySensor
@@ -16,13 +16,27 @@ import cv2
 
 import numpy as np
 
-def main():
+def debugImg(img):
+    while True:
+        cv2.imshow('test', img)
+        if cv2.waitKey(25) & 0xFF == ord('c'):
+            cv2.destroyAllWindows()
+            break
 
+def main():
     # init game actions
-    game_name = 'CandyCrush'#'90_ticks'
+    game_name = 'CandyCrush.swf'#'90_ticks'
+
+    # game_name = 'candy-crush.exe'
+    use_ruffle = True
+
+    window_name = f'Ruffle - {game_name}' if use_ruffle else 'Adobe Flash Player 10'
+    
     actions = GameActions(
-        game_path = f'src/Game/{game_name}.swf',
-        ruffle_path = 'src/Game/ruffle.exe'
+        game_path = f'src/Game/{game_name}',
+        ruffle_path = 'src/Game/ruffle.exe',
+        window_name = window_name,
+        ruffle = use_ruffle
     )
 
     # while keyboard.is_pressed('i') == False:
@@ -39,7 +53,8 @@ def main():
     # Create sensor object
     # candy_sensor = cv2CandySensor(*actions.get_board_data())
     # candy_sensor = CandyDetector(*actions.get_board_data())
-    candy_sensor = BgrCandySensor(f'Ruffle - {game_name}.swf')
+
+    candy_sensor = BgrCandySensor(window_name, use_ruffle=use_ruffle)
     actions.set_board_values(*candy_sensor.get_board_data())
     actions.skip_intro()
 
@@ -61,6 +76,7 @@ def main():
         # Get game matrix
         # actions.pause_game() #pause game
         candy_matrix, img = candy_sensor.get_candy_matrix()
+        # debugImg(img)
         actions.set_board_values(*candy_sensor.get_board_data())
 
         # if candy_sensor.game_is_over():
@@ -91,6 +107,7 @@ def main():
                     prev_mov_data = mov_data
             
         else:
+            print(candy_matrix)
             print("Board is moving...")
 
         # Check if time is over
@@ -118,7 +135,7 @@ if __name__ == '__main__':
 # portatil juan
 # x = 133, y = 87, cell_size_w = 88, cell_size_h = 78, templates_path='candies'
 
-# pc juan
+# pqqqqqqqqqqc juan
 # x = 105, y = 70, cell_size_w = 71, cell_size_h = 63, templates_path='candies_pc'
 
 
