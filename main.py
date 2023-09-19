@@ -1,6 +1,6 @@
-from src.Sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
-from src.Sensors.cv2CandySensor import cv2CandySensor
-from src.Sensors.CandyDetector_v2 import CandyDetector
+# from src.Sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
+# from src.Sensors.cv2CandySensor import cv2CandySensor
+# from src.Sensors.CandyDetector_v2 import CandyDetector
 from src.Sensors.bgrCandySensor import BgrCandySensor
 
 from src.utils.GameUtils import GameActions
@@ -22,21 +22,37 @@ def debugImg(img):
         if cv2.waitKey(25) & 0xFF == ord('c'):
             cv2.destroyAllWindows()
             break
+    
 
 def main():
-    # init game actions
-    game_name = 'CandyCrush.swf'#'90_ticks'
 
+    game_name = '90_ticks.swf' 
+    # game_name = '300_ticks.swf'
+    # game_name = 'CandyCrush.swf'
     # game_name = 'candy-crush.exe'
-    use_ruffle = True
 
-    window_name = f'Ruffle - {game_name}' if use_ruffle else 'Adobe Flash Player 10'
-    
+    # game_engine = 'ruffle'
+    # game_engine = 'flash_exe'
+    game_engine = 'flash_stand_alone'
+
+    window_names = {
+        'ruffle': f'Ruffle - {game_name}',
+        'flash_exe': 'Adobe Flash Player 10',
+        'flash_stand_alone': 'Adobe Flash Player 32'
+    }
+
+    window_name = window_names[game_engine]
+
+    y_offset = 0
+    if game_engine == 'flash_exe' or game_engine == 'flash_stand_alone':
+        y_offset = -19
+
     actions = GameActions(
         game_path = f'src/Game/{game_name}',
         ruffle_path = 'src/Game/ruffle.exe',
         window_name = window_name,
-        ruffle = use_ruffle
+        game_engine = game_engine,
+        y_offset = y_offset,      
     )
 
     # while keyboard.is_pressed('i') == False:
@@ -48,15 +64,20 @@ def main():
     max_time = 4*60 + 12
     start_time = datetime.now()
 
-    actions.open_game(fps = 120, delay = 5.5)
+    actions.open_game(fps = 120, delay = 3)
 
     # Create sensor object
     # candy_sensor = cv2CandySensor(*actions.get_board_data())
     # candy_sensor = CandyDetector(*actions.get_board_data())
 
-    candy_sensor = BgrCandySensor(window_name, use_ruffle=use_ruffle)
+    candy_sensor = BgrCandySensor(
+        window_name,
+        y_offset=y_offset
+    )
     actions.set_board_values(*candy_sensor.get_board_data())
-    actions.skip_intro()
+    actions.skip_intro(delay = 1)
+
+    # keyboard.press_and_release('f')
 
     # init agent
     candy_agent = Agent() 

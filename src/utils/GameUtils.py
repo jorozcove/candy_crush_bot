@@ -11,24 +11,38 @@ import pyautogui
 
 import win32api, win32con
 
+import pygetwindow as gw
+
 class GameActions:
-    def __init__(self, game_path, ruffle_path, window_name, ruffle = True):
+    def __init__(self, game_path, ruffle_path, window_name, game_engine, x_offset = 0, y_offset = 0):
         self.game_path = game_path
         self.ruffle_path = ruffle_path
-        self.ruffle = ruffle
         self.window_name = window_name
+        self.game_engine = game_engine
+        self.x_offset = x_offset
+        self.y_offset = y_offset
+
+        launch_params = {
+            'ruffle': [self.ruffle_path, self.game_path, '--frame-rate', '60', '--open-url-mode', 'deny'],
+            'flash_exe': [self.game_path],
+            'flash_stand_alone': ['src/Game/flashplayer_32_sa.exe',self.game_path]
+        }
+
+        self.launch_params = launch_params[game_engine]
 
     def open_game(self, fps = '60', delay = 8):
-        # Open game ruffle.exe CandyCrush.swf --frame-rate 100 --open-url-mode deny
-        if self.ruffle:
-            subprocess.Popen([self.ruffle_path, self.game_path, '--frame-rate', str(fps), '--open-url-mode', 'deny'])
-        else:
-            subprocess.Popen([self.game_path])
+        if self.game_engine == 'ruffle':
+            self.launch_params[3] = str(fps)
 
-        # Resize and move window  
-        # sleep(1)
-        # window_handle = win32gui.FindWindow(None, self.window_name)
-        # win32gui.MoveWindow(window_handle, 0, 0, 964, 800, True)  
+        print(self.launch_params)
+        subprocess.Popen(self.launch_params)
+
+        window = gw.getWindowsWithTitle(self.window_name)
+        while not window:
+            window = gw.getWindowsWithTitle(self.window_name)
+        
+        window = window[0]
+        window.moveTo(0, 0)
 
         # Wait for game to load
         sleep(delay)
@@ -46,12 +60,12 @@ class GameActions:
             templates_path = resize_images(w = cell_size_w, h = cell_size_h, path = self.templates_main_path)
         self.templates_path = templates_path
 
-    def skip_intro(self):
+    def skip_intro(self, delay = 2):
         for _ in range(4):
             self.click_cell(0, 0)
             sleep(0.01)
         # Wait for game to begin
-        sleep(2)
+        sleep(delay)
 
     def pause_game(self):
         # Pause game
@@ -59,14 +73,20 @@ class GameActions:
 
     def close_game(self):
         # Close game
-        subprocess.Popen(['taskkill', '/F', '/IM', 'ruffle.exe'])
+        if self.game_engine == 'ruffle':
+            subprocess.Popen(['taskkill', '/F', '/IM', 'ruffle.exe'])
+        elif self.game_engine == 'flash_exe':
+            subprocess.Popen(['taskkill', '/F', '/IM', 'candy-crush.exe'])
+        elif self.game_engine == 'flash_stand_alone':
+            subprocess.Popen(['taskkill', '/F', '/IM', 'flashplayer_32_sa.exe'])
 
     def click(self, x, y):
         # win32api.SetCursorPos((x, y))
         # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
         # # sleep(0.02)
         # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
-        pyautogui.moveTo(x, y)
+        
+        pyautogui.moveTo(x + self.x_offset, y + self.y_offset)
         pyautogui.click()
 
     def click_cell(self, cell_i, cell_j):
