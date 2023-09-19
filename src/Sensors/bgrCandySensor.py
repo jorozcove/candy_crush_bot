@@ -13,33 +13,32 @@ def debugImg(img):
             break
 
 class BgrCandySensor:
-    def __init__(self, window_name, use_ruffle = True):
+    def __init__(self, window_name, x_offset = 0, y_offset = 0):
+
+        # self.colors_bgr = { 
+        #   "r": (1, 2, 246), "r_sh": (59,  59, 236), "r_sv": (78,  80, 237), "r_p": (36, 35, 253),
+        #   "g" : (2, 181, 54), "g_sh": ( 74, 233, 111), "g_sv": (107, 242, 143), "g_p": (47, 229, 91),
+        #   "b": (252, 152,  46), "b_sh": (236, 186,  75), "b_sv": (246, 196, 109),"b_p": (254, 190,  37),
+        #   "y": (12, 225, 252),  "y_sh": (96, 226, 251), "y_sv": (94, 224, 252), "y_p": (51, 225, 255),
+        #   "p": (255,  37, 199), "p_sh": (243,  92, 217), "p_sv": (245, 102, 217), "p_p": (255,  40, 206),
+        #   "o": (35, 155, 255), "o_sh" : (94, 192, 249), "o_sv": (102, 197, 248), "o_p" : (30, 170, 255),
+        #   "Ñ": (45, 69, 112)
+        #  }
 
         self.colors_bgr = { 
-          "r": (1, 2, 246), "r_sh": (59,  59, 236), "r_sv": (78,  80, 237), "r_p": (36, 35, 253),
-          "g" : (2, 181, 54), "g_sh": ( 74, 233, 111), "g_sv": (107, 242, 143), "g_p": (47, 229, 91),
-          "b": (252, 152,  46), "b_sh": (236, 186,  75), "b_sv": (246, 196, 109),"b_p": (254, 190,  37),
-          "y": (12, 225, 252),  "y_sh": (96, 226, 251), "y_sv": (94, 224, 252), "y_p": (51, 225, 255),
-          "p": (255,  37, 199), "p_sh": (243,  92, 217), "p_sv": (245, 102, 217), "p_p": (255,  40, 206),
-          "o": (35, 155, 255), "o_sh" : (94, 192, 249), "o_sv": (102, 197, 248), "o_p" : (30, 170, 255),
+          "r": (1, 2, 246), "r_sh": (72,  74, 243), "r_sv": (99, 102, 246), "r_p": (36, 35, 253),
+          "g" : (2, 181, 54), "g_sh": ( 62, 225, 101), "g_sv": (79, 228, 116), "g_p": (47, 229, 91),
+          "b": (252, 152,  46), "b_sh": (236, 186,  75), "b_sv": (244, 183,  79),"b_p": (254, 190,  37),
+          "y": (12, 225, 252),  "y_sh": (66, 217, 251), "y_sv": (67, 216, 251), "y_p": (51, 225, 255),
+          "p": (255,  37, 199), "p_sh": (243, 102, 217), "p_sv": (245, 102, 217), "p_p": (255,  40, 206),
+          "o": (35, 155, 255), "o_sh" : (112, 197, 249), "o_sv": (129, 207, 250), "o_p" : (30, 170, 255),
           "Ñ": (45, 69, 112)
          }
 
-        # self.colors_bgr = { 
-        #   "r": (1, 2, 246), "r_sh": (72,  74, 243), "r_sv": (99, 102, 246), "r_p": (36, 35, 253),
-        #   "g" : (2, 181, 54), "g_sh": ( 62, 225, 101), "g_sv": (79, 228, 116), "g_p": (47, 229, 91),
-        #   "b": (252, 152,  46), "b_sh": (236, 186,  75), "b_sv": (244, 183,  79),"b_p": (254, 190,  37),
-        #   "y": (12, 225, 252),  "y_sh": (66, 217, 251), "y_sv": (67, 216, 251), "y_p": (51, 225, 255),
-        #   "p": (255,  37, 199), "p_sh": (243, 102, 217), "p_sv": (245, 102, 217), "p_p": (255,  40, 206),
-        #   "o": (35, 155, 255), "o_sh" : (112, 197, 249), "o_sv": (129, 207, 250), "o_p" : (30, 170, 255),
-        #   "Ñ": (45, 69, 112)
-        #  }
+        self.x_offset = x_offset
+        self.y_offset = y_offset
         
         self.wincap = WindowCapture(window_name)
-        
-
-        self.y_offset = 0 if use_ruffle else -28
-
         self.set_board_values()
 
     
@@ -60,8 +59,10 @@ class BgrCandySensor:
         self.cell_size_w = cell_size_w
         self.cell_size_h = cell_size_h
 
-        #add offset to board_relative_y
+        self.board_relative_x += self.x_offset
         self.board_relative_y += self.y_offset
+
+        print(f"Board data: {self.board_x}, {self.board_y}, {self.cell_size_w}, {self.cell_size_h}")
 
     def get_board_data(self):
         return self.board_x, self.board_y, self.cell_size_w, self.cell_size_h
@@ -135,6 +136,27 @@ class BgrCandySensor:
         candy_matrix = np.empty((9, 9), dtype=object)
 
         image = self.wincap.get_screenshot(self.board_relative_x, self.board_relative_y, self.cell_size_w*9, self.cell_size_h*9)
+
+        for r in range(9):
+            for c in range(9):
+                color_val = self.get_bgr_mean(r, c, image)
+                color = self.categorize_color(color_val)
+                candy_matrix[r, c] = color
+
+        #change 0,3 to '?' because object is permanently there
+        candy_matrix[0, 3] = '?'
+
+        print(f"Time to get candy matrix: {(datetime.now() - start_time).total_seconds()} seconds")
+
+        return candy_matrix, image
+
+    def get_candy_matrix_img(self, img):
+        start_time = datetime.now()
+        self.set_board_values()
+
+        candy_matrix = np.empty((9, 9), dtype=object)
+
+        image = img
 
         for r in range(9):
             for c in range(9):
