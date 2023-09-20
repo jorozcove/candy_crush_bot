@@ -26,9 +26,9 @@ def debugImg(img):
 
 def main():
 
-    game_name = '90_ticks.swf' 
-    # game_name = '300_ticks.swf'
-    # game_name = 'CandyCrush.swf'
+    # game_name = '90_ticks.swf' 
+    # game_name = '1000_ticks.swf'
+    game_name = 'CandyCrush.swf'
     # game_name = 'candy-crush.exe'
 
     # game_engine = 'ruffle'
@@ -64,7 +64,7 @@ def main():
     max_time = 4*60 + 12
     start_time = datetime.now()
 
-    actions.open_game(fps = 120, delay = 3)
+    actions.open_game(fps = 120, delay = 5)
 
     # Create sensor object
     # candy_sensor = cv2CandySensor(*actions.get_board_data())
