@@ -1,7 +1,7 @@
 
 from src.Sensors.windowcapture import WindowCapture
 import cv2
-import pyautogui
+# import pyautogui
 from src.Sensors.bgrCandySensor import BgrCandySensor
 
 def set_board_values(wincap):
@@ -23,7 +23,7 @@ def set_board_values(wincap):
 
     return board_relative_x, board_relative_y, cell_size_w, cell_size_h
 
-game_name = 'Adobe Flash Player 10' #'Ruffle - CandyCrush.swf'
+game_name = 'Adobe Flash Player 32' #'Ruffle - CandyCrush.swf'
 w_name = f'{game_name}'
 
 wincap = WindowCapture(w_name)

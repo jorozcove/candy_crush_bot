@@ -7,7 +7,7 @@ from .resizer import resize_images
 import os
 import subprocess
 import keyboard
-import pyautogui
+from pynput.mouse import Button, Controller
 
 import win32api, win32con
 
@@ -29,6 +29,8 @@ class GameActions:
         }
 
         self.launch_params = launch_params[game_engine]
+
+        self.mouse = Controller()
 
     def open_game(self, fps = '60', delay = 8):
         if self.game_engine == 'ruffle':
@@ -83,11 +85,16 @@ class GameActions:
     def click(self, x, y):
         # win32api.SetCursorPos((x, y))
         # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-        # # sleep(0.02)
+        # sleep(0.02)
         # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
         
-        pyautogui.moveTo(x + self.x_offset, y + self.y_offset)
-        pyautogui.click()
+        # pyautogui.moveTo(x + self.x_offset, y + self.y_offset)
+        # pyautogui.click()
+
+        self.mouse.position = (x + self.x_offset, y + self.y_offset)
+        self.mouse.press(Button.left)
+        self.mouse.release(Button.left)
+        
 
     def click_cell(self, cell_i, cell_j):
         data = self.x + self.cell_size_w * cell_j + self.cell_size_w // 2, self.y + self.cell_size_h * cell_i + self.cell_size_h // 2
@@ -97,22 +104,22 @@ class GameActions:
     def swap_cells(self, cell_i, cell_j, direction):
         if direction == 'up':
             self.click_cell(cell_i, cell_j)
-            # sleep(0.05)
+            sleep(0.05)
             self.click_cell(cell_i - 1, cell_j)
 
         elif direction == 'down':
             self.click_cell(cell_i, cell_j)
-            # sleep(0.05)
+            sleep(0.05)
             self.click_cell(cell_i + 1, cell_j)
 
         elif direction == 'left':
             self.click_cell(cell_i, cell_j)
-            # sleep(0.05)
+            sleep(0.05)
             self.click_cell(cell_i, cell_j - 1)
 
         elif direction == 'right':
             self.click_cell(cell_i, cell_j)
-            # sleep(0.05)
+            sleep(0.05)
             self.click_cell(cell_i, cell_j + 1)
 
 if __name__ == "__main__":
