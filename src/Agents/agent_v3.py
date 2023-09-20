@@ -130,9 +130,9 @@ class Agent:
         current_position = 0  # Añadir posición inicial
 
         for idx, variant in enumerate(arr[1:], start=1):  # Añadir índice a la enumeración
-            if variant == '?':
-                current_count = 1
-                continue
+            # if variant == '?':
+            #     # current_count = 0
+            #     break
             if variant != None:
                 variant = variant[0]  # El primer caracter es el color
             if variant == current_variant:
@@ -145,6 +145,13 @@ class Agent:
                 current_position = idx  # Actualizar la posición actual
         max_consecutive[current_variant] = max(max_consecutive.get(current_variant, 0), current_count)
         matches.append((current_variant, current_count, current_position, current_position + current_count - 1))  # Añadir posición de inicio y fin a las coincidencias
+
+        #eliminar '?' de las coincidencias y del diccionario
+        matches = list(filter(lambda x: x[0] != '?', matches))
+        for key in list(max_consecutive.keys()):
+            if key == '?':
+                del max_consecutive[key]
+
         return max_consecutive, list(filter(lambda x: x[1] >=3, matches))
 
     def count_consecutive_candies(self, dictionary):
@@ -229,3 +236,12 @@ class Agent:
             raise Exception("Game matrix not found")
         self.compute_best_move()
         return self.best_move
+
+# if __name__ == '__main__':
+#     agent = Agent()
+#     #?,b,r,r,g,p,p,g,g
+#     row = ['?', 'b', 'r', 'r', 'g', 'p', 'p', 'g', 'g']
+#     row_mcc, row_matches = agent.max_consecutive_candies(row)
+#     print(row_mcc)
+#     count = agent.count_consecutive_candies(row_mcc)
+#     print(count)

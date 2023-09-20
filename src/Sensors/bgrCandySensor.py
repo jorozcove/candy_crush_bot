@@ -144,7 +144,7 @@ class BgrCandySensor:
                 candy_matrix[r, c] = color
 
         #change 0,3 to '?' because object is permanently there
-        candy_matrix[0, 3] = '?'
+        # candy_matrix[0, 3] = '?'
 
         print(f"Time to get candy matrix: {(datetime.now() - start_time).total_seconds()} seconds")
 
@@ -165,7 +165,7 @@ class BgrCandySensor:
                 candy_matrix[r, c] = color
 
         #change 0,3 to '?' because object is permanently there
-        candy_matrix[0, 3] = '?'
+        # candy_matrix[0, 3] = '?'
 
         print(f"Time to get candy matrix: {(datetime.now() - start_time).total_seconds()} seconds")
 
