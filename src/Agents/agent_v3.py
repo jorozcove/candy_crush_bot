@@ -202,6 +202,26 @@ class Agent:
         else:
             return 0
 
+    def find_variant(self, color):
+        color_where = np.where(self.game_matrix == color)
+        if len(color_where[0]) > 0:
+            return color_where[0][0], color_where[1][0]
+        return None
+
+    def chocolate_swap(self):
+        pos = self.find_variant('Ñ')
+        if pos != None:
+            i, j = pos
+
+            if i != 0:
+                agent.best_move = (i, j, 'up')
+            elif i != 8:
+                agent.best_move = (i, j, 'down')
+            elif j != 0:
+                agent.best_move = (i, j, 'left')
+            elif j != 8:
+                agent.best_move = (i, j, 'right')
+
     def examine_possible_moves(self, i, j,  possible_moves, max_score=0):
         for move in possible_moves:
             score, new_pos = self.decide_best_move(i, j, move)
@@ -235,13 +255,39 @@ class Agent:
         if self.game_matrix is None:
             raise Exception("Game matrix not found")
         self.compute_best_move()
+
+        if self.best_move is None:
+            self.chocolate_swap()
+
         return self.best_move
 
-# if __name__ == '__main__':
-#     agent = Agent()
-#     #?,b,r,r,g,p,p,g,g
-#     row = ['?', 'b', 'r', 'r', 'g', 'p', 'p', 'g', 'g']
-#     row_mcc, row_matches = agent.max_consecutive_candies(row)
-#     print(row_mcc)
-#     count = agent.count_consecutive_candies(row_mcc)
-#     print(count)
+if __name__ == '__main__':
+    import numpy as np
+    agent = Agent()
+
+    # o,o,b,b,p,r,o,o,b
+    # o,g,y,b,y,b,r,y,g
+    # r,r,g,p,r,o,y,b,r
+    # g,r,o,g,b,r,g,r,o
+    # g,b,y,b,o,y,y,o,b
+    # r,p,g,r,Ñ,o,b,g,g
+    # b,o,p,y,b,p,y,r,b
+    # b,r,o,g,o,b,g,b,p
+    # g,p,b,y,p,g,o,r,g
+
+    candy_matrix = np.array([
+        ['o', 'o', 'b', 'b', 'p', 'r', 'o', 'o', 'b'],
+        ['o', 'g', 'y', 'b', 'y', 'b', 'r', 'y', 'g'],
+        ['r', 'r', 'g', 'p', 'r', 'o', 'y', 'b', 'r'],
+        ['g', 'r', 'o', 'g', 'b', 'r', 'g', 'r', 'o'],
+        ['g', 'b', 'y', 'b', 'o', 'y', 'y', 'o', 'b'],
+        ['r', 'p', 'g', 'r', 'Ñ', 'o', 'b', 'g', 'g'],
+        ['b', 'o', 'p', 'y', 'b', 'p', 'y', 'r', 'b'],
+        ['b', 'r', 'o', 'g', 'o', 'b', 'g', 'b', 'p'],
+        ['g', 'p', 'b', 'y', 'p', 'g', 'o', 'r', 'g']
+    ])
+
+    agent.set_game_matrix(candy_matrix)
+    move = agent.play()
+
+    print(agent.best_move)
