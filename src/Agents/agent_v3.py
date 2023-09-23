@@ -2,6 +2,7 @@ from copy import deepcopy
 import itertools
 import time
 from threading import Thread
+import numpy as np
 
 class Agent:
     def __init__(self):
@@ -10,6 +11,7 @@ class Agent:
         self.special_candies = ['Ñ', '_sv', '_sh', '_p']
         self.possible_combos = list(itertools.permutations(self.special_candies, 2)) + [(candy, candy) for candy in self.special_candies]
         self.combos = {}
+        self.est_score = 0
 
     def set_game_matrix(self, matrix):
         self.game_matrix = matrix
@@ -178,7 +180,7 @@ class Agent:
         return False
 
     def get_combo(self, candy1, candy2):
-        print(">>>>>>>>>>", candy1, candy2)
+        # print(">>>>>>>>>>", candy1, candy2)
         for combo in self.possible_combos:
             if candy1.endswith(combo[0]) and candy2.endswith(combo[1]):
                 return combo[0] + combo[1]
@@ -197,8 +199,8 @@ class Agent:
             return 1080
         elif combo == '_sv_p' or combo == '_p_sv' or combo == '_sh_p' or combo == '_p_sh':
             return 2160
-        elif combo == '_p_p':
-            return 2160
+        # elif combo == '_p_p':
+        #     return 2160
         else:
             return 0
 
@@ -228,6 +230,7 @@ class Agent:
 
             if score >= max_score[0]:
                 max_score[0] = score
+                self.est_score = score
                 self.best_move = new_pos
 
     def compute_best_move(self):
@@ -245,11 +248,11 @@ class Agent:
         # for thread in threads:
         #     thread.join()
         
-        print("==================COMBOS==================")
-        print(self.combos)
-        print("===========================================")
+        # print("==================COMBOS==================")
+        # print(self.combos)
+        # print("===========================================")
         self.combos = {}
-        print("Time to compute best move: ", time.time() - start_time)
+        # print("Time to compute best move: ", time.time() - start_time)
 
     def play(self):
         if self.game_matrix is None:
@@ -259,35 +262,8 @@ class Agent:
         if self.best_move is None:
             self.chocolate_swap()
 
+        print(f"Estimated score: {self.est_score} with move {self.best_move}")
         return self.best_move
 
-if __name__ == '__main__':
-    import numpy as np
-    agent = Agent()
-
-    # o,o,b,b,p,r,o,o,b
-    # o,g,y,b,y,b,r,y,g
-    # r,r,g,p,r,o,y,b,r
-    # g,r,o,g,b,r,g,r,o
-    # g,b,y,b,o,y,y,o,b
-    # r,p,g,r,Ñ,o,b,g,g
-    # b,o,p,y,b,p,y,r,b
-    # b,r,o,g,o,b,g,b,p
-    # g,p,b,y,p,g,o,r,g
-
-    candy_matrix = np.array([
-        ['o', 'o', 'b', 'b', 'p', 'r', 'o', 'o', 'b'],
-        ['o', 'g', 'y', 'b', 'y', 'b', 'r', 'y', 'g'],
-        ['r', 'r', 'g', 'p', 'r', 'o', 'y', 'b', 'r'],
-        ['g', 'r', 'o', 'g', 'b', 'r', 'g', 'r', 'o'],
-        ['g', 'b', 'y', 'b', 'o', 'y', 'y', 'o', 'b'],
-        ['r', 'p', 'g', 'r', 'Ñ', 'o', 'b', 'g', 'g'],
-        ['b', 'o', 'p', 'y', 'b', 'p', 'y', 'r', 'b'],
-        ['b', 'r', 'o', 'g', 'o', 'b', 'g', 'b', 'p'],
-        ['g', 'p', 'b', 'y', 'p', 'g', 'o', 'r', 'g']
-    ])
-
-    agent.set_game_matrix(candy_matrix)
-    move = agent.play()
-
-    print(agent.best_move)
+if __name__ == '__main__': 
+    pass

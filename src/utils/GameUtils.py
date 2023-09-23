@@ -98,7 +98,7 @@ class GameActions:
 
     def click_cell(self, cell_i, cell_j):
         data = self.x + self.cell_size_w * cell_j + self.cell_size_w // 2, self.y + self.cell_size_h * cell_i + self.cell_size_h // 2
-        print(cell_i, cell_j, data)
+        # print(cell_i, cell_j, data)
         self.click(*data)
 
     def swap_cells(self, cell_i, cell_j, direction):

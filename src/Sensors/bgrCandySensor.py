@@ -13,7 +13,7 @@ def debugImg(img):
             break
 
 class BgrCandySensor:
-    def __init__(self, window_name, x_offset = 0, y_offset = 0):
+    def __init__(self, window_name, categorize_threshold = 90, x_offset = 0, y_offset = 0):
 
         # self.colors_bgr = { 
         #   "r": (1, 2, 246), "r_sh": (59,  59, 236), "r_sv": (78,  80, 237), "r_p": (36, 35, 253),
@@ -35,6 +35,7 @@ class BgrCandySensor:
           "Ñ": (45, 69, 112)
          }
 
+        self.categorize_threshold = categorize_threshold
         self.x_offset = x_offset
         self.y_offset = y_offset
         
@@ -45,7 +46,7 @@ class BgrCandySensor:
     def set_board_values(self):
         self.wincap.set_window_values()
         window_size = self.wincap.window_size
-        print(f"WINDOW SIZE: {window_size}")
+        # print(f"WINDOW SIZE: {window_size}")
 
         cell_size_percentage = (0.09247609147609148, 0.09552599758162031)
         cell_size_w, cell_size_h = int(window_size[0] * cell_size_percentage[0]), int(window_size[1] * cell_size_percentage[1])
@@ -62,7 +63,7 @@ class BgrCandySensor:
         self.board_relative_x += self.x_offset
         self.board_relative_y += self.y_offset
 
-        print(f"Board data: {self.board_x}, {self.board_y}, {self.cell_size_w}, {self.cell_size_h}")
+        # print(f"Board data: {self.board_x}, {self.board_y}, {self.cell_size_w}, {self.cell_size_h}")
 
     def get_board_data(self):
         return self.board_x, self.board_y, self.cell_size_w, self.cell_size_h
@@ -89,7 +90,7 @@ class BgrCandySensor:
         manhattan = lambda x,y : abs(x[0] - y[0]) + abs(x[1] - y[1]) + abs(x[2] - y[2])
         distances = {k: manhattan(v, bgr_tuple) for k, v in self.colors_bgr.items()}
         color = min(distances, key=distances.get)
-        threshold = 90 #40
+        threshold = self.categorize_threshold #40
         if not distances[color] > threshold:
             return color
         return '?'
@@ -123,7 +124,7 @@ class BgrCandySensor:
 
         distance = manhattan(bgr_mean, close_bttn_bgr)
 
-        print("...............",distance)
+        # print("...............",distance)
     # debugImg(img)
 
         return distance > 60
@@ -146,7 +147,7 @@ class BgrCandySensor:
         #change 0,3 to '?' because object is permanently there
         # candy_matrix[0, 3] = '?'
 
-        print(f"Time to get candy matrix: {(datetime.now() - start_time).total_seconds()} seconds")
+        # print(f"Time to get candy matrix: {(datetime.now() - start_time).total_seconds()} seconds")
 
         return candy_matrix, image
 
@@ -167,6 +168,6 @@ class BgrCandySensor:
         #change 0,3 to '?' because object is permanently there
         # candy_matrix[0, 3] = '?'
 
-        print(f"Time to get candy matrix: {(datetime.now() - start_time).total_seconds()} seconds")
+        # print(f"Time to get candy matrix: {(datetime.now() - start_time).total_seconds()} seconds")
 
         return candy_matrix, image
