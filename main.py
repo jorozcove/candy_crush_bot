@@ -16,140 +16,167 @@ import cv2
 
 import numpy as np
 
-def debugImg(img):
-    while True:
-        cv2.imshow('test', img)
-        if cv2.waitKey(25) & 0xFF == ord('c'):
-            cv2.destroyAllWindows()
-            break
-    
+GAME_FILENAME = 'CandyCrush.swf'
+# GAME_FILENAME = '90_ticks.swf' 
+# GAME_FILENAME = '300_ticks.swf'
+# GAME_FILENAME = '1000_ticks.swf'
+# GAME_FILENAME = 'candy-crush.exe'
+
+# ENGINE_FILENAME = 'ruffle'
+# ENGINE_FILENAME = 'flash_exe'
+ENGINE_FILENAME = 'flash_stand_alone'
+
+RUFFLE_FPS = 120
+OPEN_DELAY = 5
+SKIP_DELAY = 1
+MOVING_THRESHOLD = 5
+CATEGORIZE_THRESHOLD = 90
+OPEN_GAME = True
 
 def main():
 
-    game_name = 'CandyCrush.swf'
-    # game_name = '90_ticks.swf' 
-    # game_name = '300_ticks.swf'
-    # game_name = '1000_ticks.swf'
-    # game_name = 'candy-crush.exe'
+    candy_actions, candy_sensor, candy_agent = init_bot(GAME_FILENAME, ENGINE_FILENAME, OPEN_GAME = OPEN_GAME)
 
-    # game_engine = 'ruffle'
-    # game_engine = 'flash_exe'
-    game_engine = 'flash_stand_alone'
-
-    window_names = {
-        'ruffle': f'Ruffle - {game_name}',
-        'flash_exe': 'Adobe Flash Player 10',
-        'flash_stand_alone': 'Adobe Flash Player 32'
-    }
-
-    window_name = window_names[game_engine]
-
-    y_offset = 0
-    if game_engine == 'flash_exe' or game_engine == 'flash_stand_alone':
-        y_offset = -19
-
-    actions = GameActions(
-        game_path = f'src/Game/{game_name}',
-        ruffle_path = 'src/Game/ruffle.exe',
-        window_name = window_name,
-        game_engine = game_engine,
-        y_offset = y_offset,      
-    )
-
-    # while keyboard.is_pressed('i') == False:
-    #     print("Press 'i' to start")
-    #     pass
-    
-    # sleep(5)
-
-    max_time = 4*60 + 12
-    start_time = datetime.now()
-
-    actions.open_game(fps = 120, delay = 5)
-
-    # Create sensor object
-    # candy_sensor = cv2CandySensor(*actions.get_board_data())
-    # candy_sensor = CandyDetector(*actions.get_board_data())
-
-    candy_sensor = BgrCandySensor(
-        window_name,
-        y_offset=y_offset
-    )
-    actions.set_board_values(*candy_sensor.get_board_data())
-    actions.skip_intro(delay = 1)
-
-    # keyboard.press_and_release('f')
-
-    # init agent
-    candy_agent = Agent() 
-
-    prev_mov_data = (0, 0, 'up')
-
+    prev_mov_data = (0, 0, 'up') # set an invalid move
     repeated_moves = 0
 
     # Bot loop
-    while keyboard.is_pressed('q') == False:
+    while True:
+        ################# BOT CONTROLS #################
 
-        # Check if user wants to pause the bot
-        if keyboard.is_pressed('p'):
+        # Quit bot
+        key = 'q'
+        if keyboard.is_pressed(key):
+            break
+
+        # Quit and close game
+        key = 'x'
+        if keyboard.is_pressed(key):
+            candy_actions.close_game()
+            break
+
+        #restart bot
+        key = 'ñ'
+        if keyboard.is_pressed(key):
+            candy_actions.close_game()
+            sleep(1)
+            cv2.destroyAllWindows()
+            main()
+            return 0
+
+        # Pause game and bot
+        key = 'p'
+        if keyboard.is_pressed(key):
             print("Paused...")
-            sleep(3)
+            pause_bot(candy_actions, key, pause_game=True)
+            print("Unpaused...")
         
-        # Get game matrix
-        # actions.pause_game() #pause game
-        candy_matrix, img = candy_sensor.get_candy_matrix()
-        # debugImg(img)
-        actions.set_board_values(*candy_sensor.get_board_data())
+        # Pause bot only
+        key = 'o'
+        if keyboard.is_pressed(key):
+            print("Paused...")
+            pause_bot(candy_actions, key, pause_game=False)
+            print("Unpaused...")
+
+        # Pause game only (Press 'a')
 
         # if candy_sensor.game_is_over():
         #     print("Game over")
         #     break
+
+        ################# BOT LOGIC #################
+        
+        # Get game matrix
+        candy_matrix, img = candy_sensor.get_candy_matrix()
+        candy_actions.set_board_values(*candy_sensor.get_board_data())
           
-        if not candy_sensor.board_is_moving(candy_matrix, threshold = 5):
+        if not candy_sensor.board_is_moving(candy_matrix, threshold = MOVING_THRESHOLD):
             # Set game matrix to agent
             candy_agent.set_game_matrix(candy_matrix)
 
             # Get best move and execute it
             mov_data = candy_agent.play()
-            
-            # sleep(0.01)
-            # actions.pause_game() #unpause game
 
             if mov_data is not None:
                 if mov_data == prev_mov_data:
-                    print("Movimiento repetido")
-                    print(mov_data, prev_mov_data)
+                    # print("Movimiento repetido")
+                    # print(mov_data, prev_mov_data)
                     prev_mov_data = (0, 0, 'up')
                     repeated_moves += 1
                     
                 else:
-                    print(candy_matrix)
+                    # print(candy_matrix)
                     i, j, direction = mov_data
-                    actions.swap_cells(i, j, direction)
+                    candy_actions.swap_cells(i, j, direction)
                     prev_mov_data = mov_data
             
-        else:
-            print(candy_matrix)
-            print("Board is moving...")
-
-        # Check if time is over
-        # if (datetime.now() - start_time).total_seconds() > max_time:
-        #     print("Time out")
-        #     break
-
         cv2.waitKey(1)
 
     print(f"Repeated moves: {repeated_moves}")
     cv2.destroyAllWindows()
 
-    sleep(8)
+    # sleep(8)
 
-    # Take screenshot of score
-    score_im_array = candy_sensor.wincap.get_screenshot()
-    cv2.imwrite(f"src/score_screenshots/score_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png", score_im_array)
+    # # Take screenshot of score
+    # score_im_array = candy_sensor.wincap.get_screenshot()
+    # cv2.imwrite(f"src/score_screenshots/score_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png", score_im_array)
 
-    # Close game
-    actions.close_game()
+    # # Close game
+    # candy_actions.close_game()
+
+def pause_bot(candy_actions, key, pause_game = True):
+    if pause_game: candy_actions.pause_game()
+    sleep(0.6)
+    while keyboard.is_pressed(key) == False:
+        sleep(0.1)
+
+    if pause_game: candy_actions.pause_game()
+
+
+def init_bot(GAME_FILENAME, ENGINE_FILENAME, OPEN_GAME = True):
+    window_names = {
+        'ruffle': f'Ruffle - {GAME_FILENAME}',
+        'flash_exe': 'Adobe Flash Player 10',
+        'flash_stand_alone': 'Adobe Flash Player 32'
+    }
+
+    window_name = window_names[ENGINE_FILENAME]
+
+    y_offset = 0
+    if ENGINE_FILENAME == 'flash_exe' or ENGINE_FILENAME == 'flash_stand_alone':
+        y_offset = -19
+
+    candy_actions = GameActions(
+        game_path = f'src/Game/{GAME_FILENAME}',
+        ruffle_path = 'src/Game/ruffle.exe',
+        window_name = window_name,
+        game_engine = ENGINE_FILENAME,
+        y_offset = y_offset,      
+    )
+
+    if OPEN_GAME:
+        candy_actions.open_game(fps = RUFFLE_FPS, delay = OPEN_DELAY)
+
+    # Create sensor object
+    # candy_sensor = cv2CandySensor(*candy_actions.get_board_data())
+    # candy_sensor = CandyDetector(*candy_actions.get_board_data())
+
+    candy_sensor = BgrCandySensor(
+        window_name,
+        categorize_threshold = CATEGORIZE_THRESHOLD,
+        y_offset=y_offset
+    )
+    candy_actions.set_board_values(*candy_sensor.get_board_data())
+
+    if OPEN_GAME:
+        candy_actions.skip_intro(delay = SKIP_DELAY)
+
+    # keyboard.press_and_release('f')
+
+    # init agent
+    candy_agent = Agent()
+
+    return candy_actions, candy_sensor, candy_agent
 
 if __name__ == '__main__':   
     main()
@@ -157,7 +184,7 @@ if __name__ == '__main__':
 # portatil juan
 # x = 133, y = 87, cell_size_w = 88, cell_size_h = 78, templates_path='candies'
 
-# pqqqqqqqqqqc juan
+# pc juan
 # x = 105, y = 70, cell_size_w = 71, cell_size_h = 63, templates_path='candies_pc'
 
 
