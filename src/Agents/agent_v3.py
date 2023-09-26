@@ -11,6 +11,7 @@ class Agent:
         self.special_candies = ['Ñ', '_sv', '_sh', '_p']
         self.possible_combos = list(itertools.permutations(self.special_candies, 2)) + [(candy, candy) for candy in self.special_candies]
         self.combos = {}
+        self.est_score = 0
 
     def set_game_matrix(self, matrix):
         self.game_matrix = matrix
@@ -173,7 +174,7 @@ class Agent:
         return False
 
     def get_combo(self, candy1, candy2):
-        print(">>>>>>>>>>", candy1, candy2)
+        # print(">>>>>>>>>>", candy1, candy2)
         for combo in self.possible_combos:
             if candy1.endswith(combo[0]) and candy2.endswith(combo[1]):
                 return combo[0] + combo[1]
@@ -192,8 +193,8 @@ class Agent:
             return 1080
         elif combo == '_sv_p' or combo == '_p_sv' or combo == '_sh_p' or combo == '_p_sh':
             return 2160
-        elif combo == '_p_p':
-            return 2160
+        # elif combo == '_p_p':
+        #     return 2160
         else:
             return 0
 
@@ -223,6 +224,7 @@ class Agent:
 
             if score >= max_score[0]:
                 max_score[0] = score
+                self.est_score = score
                 self.best_move = new_pos
 
     def compute_best_move(self):
@@ -234,11 +236,11 @@ class Agent:
                 possible_moves = ['down', 'right']
                 self.examine_possible_moves(i, j, possible_moves, max_score)
         
-        print("==================COMBOS==================")
-        print(self.combos)
-        print("===========================================")
+        # print("==================COMBOS==================")
+        # print(self.combos)
+        # print("===========================================")
         self.combos = {}
-        print("Time to compute best move: ", time.time() - start_time)
+        # print("Time to compute best move: ", time.time() - start_time)
 
     def play(self):
         if self.game_matrix is None:
@@ -248,4 +250,5 @@ class Agent:
         if self.best_move is None:
             self.chocolate_swap()
 
+        print(f"Estimated score: {self.est_score} with move {self.best_move}")
         return self.best_move
