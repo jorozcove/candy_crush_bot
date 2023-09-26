@@ -32,9 +32,9 @@ def main():
     # game_name = '1000_ticks.swf'
     # game_name = 'candy-crush.exe'
 
-    # game_engine = 'ruffle'
+    game_engine = 'ruffle'
     # game_engine = 'flash_exe'
-    game_engine = 'flash_stand_alone'
+    # game_engine = 'flash_stand_alone'
 
     window_names = {
         'ruffle': f'Ruffle - {game_name}',

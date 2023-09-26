@@ -2,6 +2,7 @@ from copy import deepcopy
 import itertools
 import time
 from threading import Thread
+import numpy as np
 
 class Agent:
     def __init__(self):
@@ -29,9 +30,7 @@ class Agent:
 
         # Realizar el movimiento
         moves = {
-            # "up": {"condition": i == 0, "swap": (i-1, j), "new_pos": (i-1, j)},
             "down": {"condition": i == 8, "swap": (i+1, j), "new_pos": (i+1, j)},
-            # "left": {"condition": j == 0, "swap": (i, j-1), "new_pos": (i, j-1)},
             "right": {"condition": j == 8, "swap": (i, j+1), "new_pos": (i, j+1)}
         }
 
@@ -39,7 +38,6 @@ class Agent:
             return 0, None
 
         # Obtener movimientos que sean combos
-        # print(moves[move]["swap"])
         if self.is_special_candy(matrix[moves[move]["swap"]]) and self.is_special_candy(matrix[i][j]):
             combo = self.get_combo(matrix[moves[move]["swap"]], matrix[i][j])
 
@@ -130,9 +128,6 @@ class Agent:
         current_position = 0  # Añadir posición inicial
 
         for idx, variant in enumerate(arr[1:], start=1):  # Añadir índice a la enumeración
-            # if variant == '?':
-            #     # current_count = 0
-            #     break
             if variant != None:
                 variant = variant[0]  # El primer caracter es el color
             if variant == current_variant:
@@ -214,13 +209,13 @@ class Agent:
             i, j = pos
 
             if i != 0:
-                agent.best_move = (i, j, 'up')
+                self.best_move = (i, j, 'up')
             elif i != 8:
-                agent.best_move = (i, j, 'down')
+                self.best_move = (i, j, 'down')
             elif j != 0:
-                agent.best_move = (i, j, 'left')
+                self.best_move = (i, j, 'left')
             elif j != 8:
-                agent.best_move = (i, j, 'right')
+                self.best_move = (i, j, 'right')
 
     def examine_possible_moves(self, i, j,  possible_moves, max_score=0):
         for move in possible_moves:
@@ -236,14 +231,8 @@ class Agent:
         threads = []
         for i in range(9):
             for j in range(9):
-                possible_moves = ['down', 'right']#['up', 'down', 'left', 'right']
+                possible_moves = ['down', 'right']
                 self.examine_possible_moves(i, j, possible_moves, max_score)
-                # thread = Thread(target=self.examine_possible_moves, args=(i, j, possible_moves, max_score))
-                # threads.append(thread)
-                # thread.start()
-
-        # for thread in threads:
-        #     thread.join()
         
         print("==================COMBOS==================")
         print(self.combos)
@@ -253,41 +242,10 @@ class Agent:
 
     def play(self):
         if self.game_matrix is None:
-            raise Exception("Game matrix not found")
+            raise ValueError("Game matrix not found")
         self.compute_best_move()
 
         if self.best_move is None:
             self.chocolate_swap()
 
         return self.best_move
-
-if __name__ == '__main__':
-    import numpy as np
-    agent = Agent()
-
-    # o,o,b,b,p,r,o,o,b
-    # o,g,y,b,y,b,r,y,g
-    # r,r,g,p,r,o,y,b,r
-    # g,r,o,g,b,r,g,r,o
-    # g,b,y,b,o,y,y,o,b
-    # r,p,g,r,Ñ,o,b,g,g
-    # b,o,p,y,b,p,y,r,b
-    # b,r,o,g,o,b,g,b,p
-    # g,p,b,y,p,g,o,r,g
-
-    candy_matrix = np.array([
-        ['o', 'o', 'b', 'b', 'p', 'r', 'o', 'o', 'b'],
-        ['o', 'g', 'y', 'b', 'y', 'b', 'r', 'y', 'g'],
-        ['r', 'r', 'g', 'p', 'r', 'o', 'y', 'b', 'r'],
-        ['g', 'r', 'o', 'g', 'b', 'r', 'g', 'r', 'o'],
-        ['g', 'b', 'y', 'b', 'o', 'y', 'y', 'o', 'b'],
-        ['r', 'p', 'g', 'r', 'Ñ', 'o', 'b', 'g', 'g'],
-        ['b', 'o', 'p', 'y', 'b', 'p', 'y', 'r', 'b'],
-        ['b', 'r', 'o', 'g', 'o', 'b', 'g', 'b', 'p'],
-        ['g', 'p', 'b', 'y', 'p', 'g', 'o', 'r', 'g']
-    ])
-
-    agent.set_game_matrix(candy_matrix)
-    move = agent.play()
-
-    print(agent.best_move)
