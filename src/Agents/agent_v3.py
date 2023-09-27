@@ -199,8 +199,8 @@ class Agent:
             return 1080
         elif combo == '_sv_p' or combo == '_p_sv' or combo == '_sh_p' or combo == '_p_sh':
             return 2160
-        # elif combo == '_p_p':
-        #     return 2160
+        elif combo == '_p_p':
+            return 2160
         else:
             return 0
 
