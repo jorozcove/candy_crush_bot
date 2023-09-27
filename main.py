@@ -1,3 +1,6 @@
+# CANDY CRUSH BOT
+# Authors: Camilo Cuello, Juan Orozco
+
 # from src.Sensors.old_sensors.cv2Sensor_v1 import cv2CandySensor
 # from src.Sensors.cv2CandySensor import cv2CandySensor
 # from src.Sensors.CandyDetector_v2 import CandyDetector
