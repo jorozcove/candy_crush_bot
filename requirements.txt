@@ -8,10 +8,13 @@ opencv-python==4.8.0.76
 Pillow==10.0.0
 PyAutoGUI==0.9.54
 PyGetWindow==0.0.9
+pyinput==0.3.2
 PyMsgBox==1.0.9
+pynput==1.7.6
 pyperclip==1.8.2
 PyRect==0.2.0
 pyscreenshot==3.1
 PyScreeze==0.1.29
 pytweening==1.0.7
 pywin32==306
+six==1.16.0
