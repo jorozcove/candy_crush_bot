@@ -9,12 +9,9 @@ from src.utils.GameUtils import GameActions
 # from src.Agents.agent_v2 import Agent
 from src.Agents.agent_v3 import Agent
 
-from datetime import datetime
 from time import sleep
 import keyboard
 import cv2
-
-import numpy as np
 
 GAME_FILENAME = 'CandyCrush.swf'
 # GAME_FILENAME = '90_ticks.swf' 
@@ -22,9 +19,12 @@ GAME_FILENAME = 'CandyCrush.swf'
 # GAME_FILENAME = '1000_ticks.swf'
 # GAME_FILENAME = 'candy-crush.exe'
 
-# ENGINE_FILENAME = 'ruffle'
+ENGINE_FILENAME = 'ruffle'
 # ENGINE_FILENAME = 'flash_exe'
-ENGINE_FILENAME = 'flash_stand_alone'
+# ENGINE_FILENAME = 'flash_stand_alone'
+
+if ENGINE_FILENAME == 'ruffle': # ??????????????
+    import pyautogui
 
 RUFFLE_FPS = 120
 OPEN_DELAY = 5
@@ -68,6 +68,7 @@ def main():
         key = 'p'
         if keyboard.is_pressed(key):
             print("Paused...")
+            print(candy_matrix)
             pause_bot(candy_actions, key, pause_game=True)
             print("Unpaused...")
         
@@ -75,6 +76,7 @@ def main():
         key = 'o'
         if keyboard.is_pressed(key):
             print("Paused...")
+            print(candy_matrix)
             pause_bot(candy_actions, key, pause_game=False)
             print("Unpaused...")
 
