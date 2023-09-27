@@ -118,8 +118,8 @@ def findMatches(board, minMatch):
 
 matrix = np.array([
     ['y', 'g', 'p', 'p', 'g', 'p', 'g', 'b', 'p'],
-    ['r', 'r', 'y', 'o', 'r', 'r', 'r', 'g', 'g'],
-    ['r', 'b', 'y', 'p', 'y', 'p', 'y', 'y', 'y'],
+    ['r', 'r', 'y', 'o', 'r', 'r_sh', 'r', 'g', 'g'],
+    ['r', 'b', 'y', 'p', 'y', 'p', 'y', 'y_sv', 'y'],
     ['y', 'r', 'p', 'g', 'o', 'p', 'y', 'o', 'r'],
     ['o', 'p', 'b', 'b', 'r', 'o', 'r', 'y', 'g'],
     ['r', 'p', 'o', 'b', 'o', 'b', 'p', 'g', 'y'],
@@ -137,7 +137,5 @@ agent = Agent()
 agent.set_game_matrix(matrix)
 
 matches = agent.find_matches(matrix, 1, 6)
-print(sorted(matches , key=lambda x: x[0]))
 
-while matches:
-    matches, matrix = agent.simulate_result(matrix, 1, 6)
+print(matches)
