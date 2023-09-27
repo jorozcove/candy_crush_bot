@@ -19,9 +19,9 @@ GAME_FILENAME = 'CandyCrush.swf'
 # GAME_FILENAME = '1000_ticks.swf'
 # GAME_FILENAME = 'candy-crush.exe'
 
-ENGINE_FILENAME = 'ruffle'
+# ENGINE_FILENAME = 'ruffle'
 # ENGINE_FILENAME = 'flash_exe'
-# ENGINE_FILENAME = 'flash_stand_alone'
+ENGINE_FILENAME = 'flash_stand_alone'
 
 if ENGINE_FILENAME == 'ruffle': # ??????????????
     import pyautogui
